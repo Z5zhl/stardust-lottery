@@ -68,8 +68,11 @@
     /* ====== 路径工具 ====== */
     function absUrl(relativePath) {
         if (typeof window !== 'undefined' && window.location) {
-            var base = window.location.protocol + '//' + window.location.host + '/';
-            return base + 'libs/mediapipe/' + relativePath;
+            var origin = window.location.origin;
+            var path = window.location.pathname;
+            // 从当前页面路径推导项目根目录（兼容 GitHub Pages 子路径 /stardust-lottery/）
+            var projectRoot = path.replace(/\/gesture-particles\/.*$/, '');
+            return origin + projectRoot + '/libs/mediapipe/' + relativePath;
         }
         return '../libs/mediapipe/' + relativePath;
     }
