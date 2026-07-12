@@ -274,7 +274,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#020510;font-family:
 <script type="importmap">
 {"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
 </script>
-<script src="js/gesture-controller.js"></script>
 <script src="js/stardust-gesture.js"></script>
 
 <script type="module">
@@ -2601,8 +2600,6 @@ function showRarityFlash(prize){
 function showGuide(){guideOverlay.classList.add('active');}
 function hideGuide(){guideOverlay.classList.remove('active');}
 // ==================== 奖品展示面板（纯HTML，超清晰） ====================
-function drawPrizeCard(prize){/* : canvas卡片已废弃，改用纯HTML面板 */}
-
 function showPrizeOverlay(prize){
   // : 记录中奖历史
   addHistory(prize);
