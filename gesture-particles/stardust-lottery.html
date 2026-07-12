@@ -74,14 +74,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#020510;font-family:
 #hud-overlay .hud-crosshair::before{width:1px;height:100%;left:50%;}
 #hud-overlay .hud-crosshair::after{height:1px;width:100%;top:50%;}
 
-/* 奖品展示 - V34 彻底重设计：超大居中卡片 */
+/* 奖品展示 - 彻底重设计：超大居中卡片 */
 #prize-overlay{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .8s cubic-bezier(0.4,0,0.2,1);}
 #prize-overlay.active{opacity:1;pointer-events:all}
 #prize-overlay-bg{position:absolute;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
 #prize-overlay-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px;transform:scale(0.9);transition:transform .8s cubic-bezier(0.34,1.56,0.64,1);}
 #prize-overlay.active #prize-overlay-content{transform:scale(1)}
 
-/* V34 超大居中奖品卡片 */
+/* 超大居中奖品卡片 */
 #prize-card-main{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px 48px;border-radius:16px;background:rgba(4,10,30,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);min-width:320px;max-width:520px;}
 #prize-card-glow{position:absolute;inset:-6px;border-radius:20px;filter:blur(12px);z-index:-1;opacity:0.5;pointer-events:none;}
 #prize-card-border{position:absolute;inset:0;border-radius:16px;border:1.5px solid rgba(100,200,255,0.2);pointer-events:none;}
@@ -97,7 +97,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#020510;font-family:
 /* 稀有度标签 */
 #prize-card-rarity{font-size:15px;padding:5px 22px;border-radius:14px;letter-spacing:0.25em;font-weight:600;display:inline-block;}
 
-/* 奖品名称 - V35: 超大字+极强对比度 */
+/* 奖品名称 - 超大字+极强对比度 */
 #prize-card-name{font-size:52px;font-weight:900;letter-spacing:0.15em;line-height:1.2;text-align:center;max-width:480px;word-break:break-all;color:#fff;text-shadow:0 0 40px rgba(0,200,255,0.8),0 0 80px rgba(0,200,255,0.4),0 0 150px rgba(0,100,255,0.2);}
 
 /* 奖品描述 */
@@ -138,7 +138,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#020510;font-family:
 .gi-item.active{color:#40c4ff;border-color:rgba(0,200,255,0.3)}
 #prize-frame .hud-data-item{display:none;}
 
-/* V44: 中奖历史记录面板 —— 修复定位+发光边框动画 */
+/* : 中奖历史记录面板 —— 修复定位+发光边框动画 */
 #history-panel{position:fixed;top:80px;right:12px;z-index:500;width:230px;min-height:40px;background:rgba(4,12,28,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(0,200,255,0.35);border-radius:8px;overflow:hidden;pointer-events:all;font-family:"Courier New",monospace;box-shadow:0 0 20px rgba(0,180,255,0.2),0 0 50px rgba(0,150,255,0.08);animation:panelGlow 3s ease-in-out infinite;}
 #history-panel:hover{box-shadow:0 0 40px rgba(0,150,255,0.25),0 0 80px rgba(0,200,255,0.1);}
 @keyframes panelGlow{0%,100%{box-shadow:0 0 20px rgba(0,180,255,0.2),0 0 50px rgba(0,150,255,0.08)}50%{box-shadow:0 0 30px rgba(0,200,255,0.28),0 0 60px rgba(0,180,255,0.12)}}
@@ -168,7 +168,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#020510;font-family:
 .hist-time{font-size:7px;color:rgba(100,160,220,0.3);white-space:nowrap;}
 @keyframes histSlideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
 
-/* V41: 奖品展示面板增强动画 */
+/* : 奖品展示面板增强动画 */
 #prize-overlay-content{transform:scale(0.85) translateY(20px);opacity:0;transition:transform .8s cubic-bezier(0.34,1.56,0.64,1),opacity .6s;}
 #prize-overlay.active #prize-overlay-content{transform:scale(1) translateY(0);opacity:1;}
 #prize-card-main{transition:box-shadow .6s;}
@@ -241,7 +241,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#020510;font-family:
   <div class="gi-item" id="gi-state"></div>
 </div>
 
-<!-- V42: 中奖历史记录面板 —— 可折叠、可查看、可清空 -->
+<!-- 中奖历史记录面板 —— 可折叠、可查看、可清空 -->
 <div id="history-panel">
   <div id="history-title-bar" title="点击展开/折叠">
     <span class="title-left"><span class="title-arrow">▼</span> 中奖记录</span>
@@ -286,8 +286,8 @@ const CORE_PARTICLES = 400;      // 能量核心粒子
 const SHELL_PARTICLES = 2000;    // 球壳主粒子
 const HALO_PARTICLES = 150;      // 外层光晕
 const TRAIL_PARTICLES = 600;     // 环绕流光
-const CHROMA_PARTICLES = 200;    // V40: 色散粒子（RGB分离）
-const ATMOS_PARTICLES = 400;     // V40: 屏幕空间大气粒子
+const CHROMA_PARTICLES = 200;    // : 色散粒子（RGB分离）
+const ATMOS_PARTICLES = 400;     // : 屏幕空间大气粒子
 const TOTAL_PARTICLES = CORE_PARTICLES + SHELL_PARTICLES + HALO_PARTICLES + TRAIL_PARTICLES;
 const SPHERE_R = 2.8;            // 球体半径
 const DISSOLVE_TIME = 0.5;       // 溶解时间
@@ -296,7 +296,7 @@ const PRIZE_PARTICLES = 12000;  // 奖品展示粒子（高密度+科技感）
 let fullscreenPrizeActive=false; // 全屏粒子奖品模式
 let prizeFadeOut=false; // 粒子淡出标记
 let autoResetTimer=null; // 自动重置计时器
-let splitTriggered=false; // V36: 传说级二次爆炸触发标记
+let splitTriggered=false; // : 传说级二次爆炸触发标记
 
 // ==================== 星座数据 ====================
 const CONSTELLATIONS = [
@@ -431,7 +431,7 @@ function drawDigitalRain(ctx, pc, totalTime) {
   ctx.restore();
 }
 
-// ==================== 稀有度差异化配置 V41 ====================
+// ==================== 稀有度差异化配置 ====================
 // 传说级：极致震撼特效 —— 金色海洋、多层爆炸、超新星、粒子洪流
 // 稀有级：华丽特效 —— 蓝色光柱、能量汇聚、绚丽火花
 // 普通级：简洁特效 —— 快速展示、不拖沓
@@ -439,12 +439,12 @@ const RARITY_CFG={
   legendary:{
     label:'★ LEGENDARY ★',labelCN:'传说',
     color:'#ffd740',glowColor:'#ffab00',borderColor:'#ffd740',
-    // 粒子参数 —— V41: 传说级粒子更大更亮
+    // 粒子参数 —— 传说级粒子更大更亮
     particleSize:0.24,explodeSpeed:[5,16],explodeDuration:1.2,
     reformDuration:2.2,shockwaveLayers:5,shockwaveRadius:20,shockwaveSpeed:5,
     borderParticles:2800,swirlParticles:1600,scanParticles:1000,
     flashIntensity:0.9,flashDuration:800,
-    // V41: 传说级特效增强
+    // : 传说级特效增强
     shardMultiplier:3.0,        // 碎片倍数（传说级3倍碎片）
     splitExplosion:true,        // 爆炸中途二次爆裂
     splitTiming:0.4,            // 二次爆裂发生在爆炸进度的40%
@@ -460,7 +460,7 @@ const RARITY_CFG={
     autoRotateSpeed:1.5,        // 展示时旋转速度
     iconType:'star8',iconGlow:50,cornerSize:48,cornerGlow:20,
     showSparkles:true,bgGlowSize:0.8,bgGlowAlpha:'80',
-    // V41: 传说级新增特效
+    // : 传说级新增特效
     secondaryExplosion:true,    // 二次爆炸（粒子再度爆散）
     fountainHeight:18,          // 喷泉高度
     fountainParticles:1200,     // 喷泉粒子数
@@ -481,7 +481,7 @@ const RARITY_CFG={
   rare:{
     label:'★★ RARE ★★',labelCN:'稀有',
     color:'#80d8ff',glowColor:'#40c4ff',borderColor:'#80d8ff',
-    // V41: 稀有级适度增强
+    // : 稀有级适度增强
     particleSize:0.16,explodeSpeed:[3,8],explodeDuration:0.9,
     reformDuration:1.5,shockwaveLayers:3,shockwaveRadius:12,shockwaveSpeed:7,
     borderParticles:1400,swirlParticles:600,scanParticles:500,
@@ -502,7 +502,7 @@ const RARITY_CFG={
   common:{
     label:'COMMON',labelCN:'普通',
     color:'#b0bec5',glowColor:'#78909c',borderColor:'#90a4ae',
-    // V41: 普通级保持简洁但不失优雅
+    // : 普通级保持简洁但不失优雅
     particleSize:0.12,explodeSpeed:[2,5],explodeDuration:0.6,
     reformDuration:0.9,shockwaveLayers:1,shockwaveRadius:7,shockwaveSpeed:10,
     borderParticles:600,swirlParticles:200,scanParticles:200,
@@ -524,7 +524,7 @@ const RARITY_CFG={
 function getRarityCfg(prize){return RARITY_CFG[prize?.rarity]||RARITY_CFG.common;}
 let currentRarityCfg=RARITY_CFG.common; // 当前抽奖等级配置
 
-// ==================== V42: 中奖历史记录系统（可折叠、可查看、可清空） ====================
+// ==================== : 中奖历史记录系统（可折叠、可查看、可清空） ====================
 let drawHistory = []; // 存储中奖记录，刷新即清空
 
 function addHistory(prize) {
@@ -571,7 +571,7 @@ function renderHistory() {
   }
 }
 
-// V42: 面板折叠/展开
+// : 面板折叠/展开
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
     const titleBar = el('history-title-bar');
@@ -902,8 +902,8 @@ let satTrails=[];           // 卫星拖尾线
 let elecArcs=[];            // 电弧线
 let glowSprite=null;        // 辉光精灵
 let plasmaShell=null;       // 等离子壳层
-let chromaHalo=null;        // V40: 色散光晕（RGB分离）
-let atmosDust=null;         // V40: 屏幕空间大气粒子
+let chromaHalo=null;        // : 色散光晕（RGB分离）
+let atmosDust=null;         // : 屏幕空间大气粒子
 let fieldLines=[];          // 磁力线
 let forceGrid=null;         // 力场网格
 let currentCardIdx=0;
@@ -916,32 +916,32 @@ let quantumSparks=null;     // 量子闪烁粒子
 const QUANTUM_SPARKS=200;   // 闪烁粒子数量
 let quantumSparkPhases=[];  // 闪烁粒子相位
 
-// ==================== V32 新增：核心脉冲波系统 ====================
+// ==================== 新增：核心脉冲波系统 ====================
 const PULSE_WAVES_MAX=4;
 let pulseWaves=[];
 let nextPulseTime=rand(1.5,3);
 
-// ==================== V32 新增：能量网络连线系统 ====================
+// ==================== 新增：能量网络连线系统 ====================
 const ENERGY_LINES_MAX=40;
 let energyLines=[];
 let energyLinesGroup=null;
 let nextEnergyLineTime=0;
 
-// ==================== V32 新增：碎裂爆炸碎片系统 ====================
+// ==================== 新增：碎裂爆炸碎片系统 ====================
 const SHARD_COUNT=120;
 let shardsGroup=null;
 let shardMeshes=[];
 let shardVelocities=[];
 
-// ==================== V32 新增：奖品粒子螺旋涡流系统 ====================
+// ==================== 新增：奖品粒子螺旋涡流系统 ====================
 const VORTEX_PARTICLES=600;
 let vortexParticles=null;
 let vortexData=[];
 
-// ==================== V32 新增：极光效果系统 ====================
+// ==================== 新增：极光效果系统 ====================
 let auroraPlanes=[];
 
-// ==================== V32 新增：星系旋臂粒子 ====================
+// ==================== 新增：星系旋臂粒子 ====================
 const ARM_PARTICLES=1500;
 let spiralArms=[];
 
@@ -1212,7 +1212,7 @@ function createPersistentSphere(cardIdx){
   quantumSparks=new THREE.Points(qsGeo,new THREE.PointsMaterial({size:0.08,map:brightTex,vertexColors:true,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0.7}));
   sphereGroup.add(quantumSparks);
 
-  // ---- V32 核心脉冲波（球心向外扩散的涟漪环） ----
+  // ---- 核心脉冲波（球心向外扩散的涟漪环） ----
   for(let i=0;i<PULSE_WAVES_MAX;i++){
     const pulseGeo=new THREE.RingGeometry(SPHERE_R*0.1,SPHERE_R*0.12,64);
     const pulseMat=new THREE.MeshBasicMaterial({color:hex,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending});
@@ -1224,7 +1224,7 @@ function createPersistentSphere(cardIdx){
     sphereGroup.add(pulse);pulseWaves.push(pulse);
   }
 
-  // ---- V32 能量网络连线（球壳粒子间的星座式连线） ----
+  // ---- 能量网络连线（球壳粒子间的星座式连线） ----
   energyLinesGroup=new THREE.Group();
   energyLines=[];
   for(let i=0;i<ENERGY_LINES_MAX;i++){
@@ -1249,7 +1249,7 @@ function createPersistentSphere(cardIdx){
   glowSprite.scale.set(SPHERE_R*4.5,SPHERE_R*4.5,1);
   sphereGroup.add(glowSprite);
 
-  // ---- V40: 色散光晕（RGB三色分离粒子环，科幻感色彩偏移） ----
+  // ---- : 色散光晕（RGB三色分离粒子环，科幻感色彩偏移） ----
   const chromaGeo=new THREE.BufferGeometry();
   const chromaPos=new Float32Array(CHROMA_PARTICLES*3);
   const chromaColors=new Float32Array(CHROMA_PARTICLES*3);
@@ -1270,7 +1270,7 @@ function createPersistentSphere(cardIdx){
   chromaHalo=new THREE.Points(chromaGeo,new THREE.PointsMaterial({size:0.09,map:brightTex,vertexColors:true,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0.5}));
   sphereGroup.add(chromaHalo);
 
-  // ---- V40: 屏幕空间大气粒子（漂浮在球体周围的微尘） ----
+  // ---- : 屏幕空间大气粒子（漂浮在球体周围的微尘） ----
   const atmosGeo=new THREE.BufferGeometry();
   const atmosPos=new Float32Array(ATMOS_PARTICLES*3);
   const atmosCol=new Float32Array(ATMOS_PARTICLES*3);
@@ -1360,7 +1360,7 @@ function setAllOpacity(val){
   if(accretionDisk)accretionDisk.material.opacity=val*0.5;
   if(quantumSparks)quantumSparks.material.opacity=val*0.7;
   if(glowSprite)glowSprite.material.opacity=val*0.45;
-  // V32 脉冲波和能量网络在切换时隐藏
+  // 脉冲波和能量网络在切换时隐藏
   for(const pw of pulseWaves){if(pw&&val<0.1){pw.visible=false;pw.material.opacity=0;}}
   for(const el2 of energyLines){if(el2&&val<0.1){el2.material.opacity=0;el2.userData.active=false;}}
 }
@@ -1453,9 +1453,9 @@ function rebuildSphereVisuals(cardIdx){
   if(forceGrid)forceGrid.material.color.set(hex);
   // 更新吸积盘颜色
   if(accretionDisk)accretionDisk.material.color.set(hex);
-  // V32 更新脉冲波颜色
+  // 更新脉冲波颜色
   for(const pw of pulseWaves){if(pw)pw.userData.baseColor.set(hex);}
-  // V32 更新能量网络连线颜色
+  // 更新能量网络连线颜色
   for(const el2 of energyLines){if(el2)el2.material.color.set(hex);}
   // 重建辉光
   if(glowSprite){
@@ -1608,7 +1608,7 @@ function updateConstellationPanel(){
 
 // ==================== 奖品粒子系统（增强版） ====================
 let prizeSystem=null;
-// V35: 3D画布文字板——CanvasTexture贴到PlaneGeometry，像素级清晰
+// : 3D画布文字板——CanvasTexture贴到PlaneGeometry，像素级清晰
 let prizeBillboard=null;
 let prizeBillboardTex=null;
 let prizeBillboardCanvas=null;
@@ -1617,7 +1617,7 @@ let prizeSwirl=null;          // 能量漩涡
 let prizeScan=null;           // 扫描线
 let prizeShockwave=null;      // 冲击波环
 let prizeDataStreams=null;    // 数据流粒子
-// V36: 光柱+火花系统（等级差异化）
+// : 光柱+火花系统（等级差异化）
 let prizeLightPillars=null;const pillarData=[];
 let prizeSparkles=null;const sparkleData=[];
 const SPARKLE_COUNT=400;
@@ -1698,7 +1698,7 @@ function initPrizeParticles(){
 }
 initPrizeParticles();
 
-// ==================== V35 3D画布文字板（像素级清晰） ====================
+// ==================== 3D画布文字板（像素级清晰） ====================
 (function initPrizeBillboard(){
   prizeBillboardCanvas=document.createElement('canvas');
   prizeBillboardCanvas.width=1024;prizeBillboardCanvas.height=512;
@@ -1712,14 +1712,14 @@ initPrizeParticles();
     depthWrite:false,blending:THREE.NormalBlending,side:THREE.DoubleSide
   });
   prizeBillboard=new THREE.Mesh(planeGeo,planeMat);
-  prizeBillboard.position.set(0,0,5); // V35: 放在球体前方，确保可见
+  prizeBillboard.position.set(0,0,5); // : 放在球体前方，确保可见
   prizeBillboard.visible=false;
   prizeBillboard.renderOrder=999;
   prizeBillboard.material.depthTest=false;
   scene.add(prizeBillboard);
 })();
 
-// ==================== V32 碎裂碎片系统初始化 ====================
+// ==================== 碎裂碎片系统初始化 ====================
 (function initShardSystem(){
   shardsGroup=new THREE.Group();
   const shardGeo=new THREE.TetrahedronGeometry(0.15,0);
@@ -1733,7 +1733,7 @@ initPrizeParticles();
   scene.add(shardsGroup);
 })();
 
-// ==================== V32 奖品涡流粒子初始化 ====================
+// ==================== 奖品涡流粒子初始化 ====================
 (function initVortexSystem(){
   const vGeo=new THREE.BufferGeometry();
   const vPos=new Float32Array(VORTEX_PARTICLES*3);
@@ -1750,7 +1750,7 @@ initPrizeParticles();
   scene.add(vortexParticles);
 })();
 
-// ==================== V36 光柱系统（重组时从文字板向外射出） ====================
+// ==================== 光柱系统（重组时从文字板向外射出） ====================
 (function initPillarSystem(){
   const pGeo=new THREE.BufferGeometry();
   const pillarCount=PILLAR_COUNT*8+40; // 8条光柱，每条约5个粒子段
@@ -1764,7 +1764,7 @@ initPrizeParticles();
   scene.add(prizeLightPillars);
 })();
 
-// ==================== V36 火花粒子系统（展示时火花雨） ====================
+// ==================== 火花粒子系统（展示时火花雨） ====================
 (function initSparkleSystem(){
   const sGeo=new THREE.BufferGeometry();
   const sPos=new Float32Array(SPARKLE_COUNT*3);
@@ -1785,7 +1785,7 @@ initPrizeParticles();
   for(let i=0;i<SPARKLE_COUNT;i++){sparkleData.push({life:0,maxLife:0,phase:rand(0,Math.PI*2),speed:rand(0.5,3)});}
 })();
 
-// ==================== V37 能量汇聚环系统（重组阶段：多环从外向内收缩） ====================
+// ==================== 能量汇聚环系统（重组阶段：多环从外向内收缩） ====================
 const CONVERGE_RING_PARTICLES=800;
 const CONVERGE_RINGS_MAX=5;
 let prizeConvergeRings=null;
@@ -1825,7 +1825,7 @@ function activateConvergeRings(prize,numRings){
   prizeConvergeRings.material.opacity=0.7;
 }
 
-// ==================== V37 粒子皇冠系统（展示阶段：奖品上方粒子皇冠） ====================
+// ==================== 粒子皇冠系统（展示阶段：奖品上方粒子皇冠） ====================
 const CROWN_PARTICLES=300;
 let prizeCrown=null;
 const crownData=[];
@@ -1858,7 +1858,7 @@ function activateCrown(prize){
   prizeCrown.material.opacity=0.8;
 }
 
-// ==================== V38: 全息环系统（展示阶段：公告板周围旋转的全息光环） ====================
+// ==================== : 全息环系统（展示阶段：公告板周围旋转的全息光环） ====================
 const HOLO_RING_PARTICLES=600;
 const HOLO_RINGS_COUNT=3;
 let prizeHoloRings=null;
@@ -1900,7 +1900,7 @@ function activateHoloRings(prize){
   prizeHoloRings.material.opacity=0.6;
 }
 
-// ==================== V40: 粒子喷泉系统（展示阶段：公告板下方粒子喷涌上升） ====================
+// ==================== : 粒子喷泉系统（展示阶段：公告板下方粒子喷涌上升） ====================
 const FOUNTAIN_PARTICLES=500;
 let prizeFountain=null;
 const fountainData=[];
@@ -1982,7 +1982,7 @@ function updateBillboardScanlines(totalTime) {
   prizeBillboardTex.needsUpdate = true;
 }
 
-// ==================== V32 极光效果系统 ====================
+// ==================== 极光效果系统 ====================
 (function initAuroraSystem(){
   for(let i=0;i<4;i++){
     const c=document.createElement('canvas');c.width=512;c.height=256;
@@ -2010,7 +2010,7 @@ function updateBillboardScanlines(totalTime) {
   }
 })();
 
-// ==================== V32 星系旋臂粒子 ====================
+// ==================== 星系旋臂粒子 ====================
 (function initSpiralArms(){
   for(let arm=0;arm<3;arm++){
     const armCount=Math.floor(ARM_PARTICLES/3);
@@ -2186,7 +2186,7 @@ function renderPrizeBillboard(prize) {
 
 function generatePrizeTargets(prize){
   const ctx=sampleCanvas.getContext('2d');
-  // V34: 精简采样区域——只绘制名称和描述，去除图标和装饰线干扰
+  // : 精简采样区域——只绘制名称和描述，去除图标和装饰线干扰
   // 名称区域占60%高度，描述区域占25%高度，确保粒子高度集中在文字上
   sampleCanvas.width=600;sampleCanvas.height=800;
   const w=sampleCanvas.width,h=sampleCanvas.height;
@@ -2199,7 +2199,7 @@ function generatePrizeTargets(prize){
   const rc=cfg.borderColor; // 边框颜色
 
   // ====== 名称区域（上方60%） ======
-  // V34: 极大号粗体+多层白色发光+描边，确保采样后文字粒子密度极高
+  // : 极大号粗体+多层白色发光+描边，确保采样后文字粒子密度极高
   const nameFontSize=220;
   const ny=h*0.38;
   const nameFont='bold '+nameFontSize+'px "Noto Sans CJK SC","Microsoft YaHei",sans-serif';
@@ -2233,7 +2233,7 @@ function generatePrizeTargets(prize){
   ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.strokeText(prize.desc||'',cx,h*0.72);ctx.restore();
 
-  // ====== 像素采样（V34: 全像素覆盖+高亮度阈值，确保文字边缘清晰） ======
+  // ====== 像素采样（全像素覆盖+高亮度阈值，确保文字边缘清晰） ======
   const imageData=ctx.getImageData(0,0,w,h);
   const pixels=imageData.data;
   const brightPixels=[];
@@ -2252,7 +2252,7 @@ function generatePrizeTargets(prize){
   const textW=Math.max(maxPx-minPx,1),textH=Math.max(maxPy-minPy,1);
   const textCx=(minPx+maxPx)/2,textCy=(minPy+maxPy)/2;
 
-  // 世界空间（V33: 放大展示区域，提高可辨识度）
+  // 世界空间（放大展示区域，提高可辨识度）
   const worldW=10,worldH=10*(textH/textW);
   const m=0.92;
   const boost=1.8;
@@ -2320,14 +2320,14 @@ let borderSource=null;   // 边框弹性动画起点
 let scanSource=null;     // 扫描线弹性动画起点
 let autoMode=false,autoTimer=null;
 
-// ==================== V32 碎裂爆炸函数 ====================
+// ==================== 碎裂爆炸函数 ====================
 function triggerShatterEffect(){
   if(!shardsGroup)return;
   const hex=CONSTELLATIONS[currentCardIdx]?.hex||0x80d8ff;
   const cfg=currentRarityCfg||getRarityCfg(selectedPrize||{rarity:'common'});
   const multiplier=cfg.shardMultiplier||1;
   const effectiveCount=Math.floor(SHARD_COUNT*multiplier);
-  // V40: 彩虹碎片颜色表
+  // : 彩虹碎片颜色表
   const rainbowColors=['#ff4444','#ff8800','#ffdd00','#44ff44','#00ccff','#4488ff','#aa44ff','#ff44aa'];
   for(let i=0;i<Math.min(effectiveCount,SHARD_COUNT);i++){
     const s=shardMeshes[i];
@@ -2341,7 +2341,7 @@ function triggerShatterEffect(){
     s.userData.vel.x+=rand(-3,3);s.userData.vel.y+=rand(-3,3);s.userData.vel.z+=rand(-3,3);
     s.userData.life=1+multiplier*0.5;
     s.userData.active=true;
-    // V40: 彩虹色碎片 —— 传说级用彩虹色，其它用稀有度颜色
+    // : 彩虹色碎片 —— 传说级用彩虹色，其它用稀有度颜色
     s.material.color.set(multiplier>=2?rainbowColors[i%rainbowColors.length]:cfg.color||hex);
     s.material.opacity=rand(0.6,1);
     s.visible=true;
@@ -2388,7 +2388,7 @@ function startDraw(){
   animSource=new Float32Array(prizePos);
   const pc=new THREE.Color(selectedPrize.color||'#40c4ff');
   const colArr=prizeSystem.geometry.attributes.color.array;
-  // V40: 爆炸粒子彩虹色散 —— 颜色从暖到冷渐变，更有冲击力
+  // : 爆炸粒子彩虹色散 —— 颜色从暖到冷渐变，更有冲击力
   const isLegendary=cfg.rarity==='legendary';
   for(let i=0;i<PRIZE_PARTICLES;i++){
     const i3=i*3;
@@ -2399,7 +2399,7 @@ function startDraw(){
     const len=Math.sqrt(dx*dx+dy*dy+dz*dz)||1;
     const speed=rand(cfg.explodeSpeed[0],cfg.explodeSpeed[1]);
     prizeVel[i3]=dx/len*speed;prizeVel[i3+1]=dy/len*speed;prizeVel[i3+2]=dz/len*speed;
-    // V40: 彩虹色散 —— 颜色在暖色→冷色之间随机分布
+    // : 彩虹色散 —— 颜色在暖色→冷色之间随机分布
     const t=i/PRIZE_PARTICLES;
     const hueShift=t*0.4-0.15; // 色相偏移范围
     const sat=isLegendary?0.7+rand(0,0.3):0.5+rand(0,0.3);
@@ -2414,7 +2414,7 @@ function startDraw(){
   prizeSystem.visible=true;prizeBorder.visible=true;prizeSwirl.visible=true;prizeScan.visible=true;
   prizeShockwave.visible=true;prizeShockwave.userData.radius=0;prizeShockwave.userData.active=false;
   prizeDataStreams.visible=true;
-  // V40: 超新星冲击环（爆炸瞬间从球心向外扩散的亮环）
+  // : 超新星冲击环（爆炸瞬间从球心向外扩散的亮环）
   if(prizeShockwave){
     prizeShockwave.userData.supernovaPhase=0;
     prizeShockwave.material.opacity=isLegendary?1.0:0.7;
@@ -2425,11 +2425,11 @@ function startDraw(){
   const vMultiplier=cfg.vortexCountMultiplier||1;
   for(let i=0;i<VORTEX_PARTICLES;i++){const m=i<VORTEX_PARTICLES*vMultiplier?1.0:0.3;vCol[i*3]=pc.r*rand(0.3,1)*m;vCol[i*3+1]=pc.g*rand(0.3,1)*m;vCol[i*3+2]=pc.b*rand(0.3,1)*m;}
   vortexParticles.geometry.attributes.color.needsUpdate=true;
-  // V32: 启动碎裂碎片
+  // : 启动碎裂碎片
   triggerShatterEffect();
-  // V36: 传说级标记二次爆炸时间点
+  // : 传说级标记二次爆炸时间点
   splitTriggered=false;
-  // V37: 稀有度彩色闪光
+  // : 稀有度彩色闪光
   showRarityFlash(selectedPrize);
   playSound('explode');hideGuide();
   el('gi-state').textContent='';
@@ -2443,7 +2443,7 @@ function finishExplode(){
   hudOverlay.classList.add('active');
   if(selectedPrize){
     hudTl.innerHTML='';hudTr.innerHTML='';hudBl.innerHTML='';
-    // V37: 稀有度公告（重组阶段显示稀有度等级文字）
+    // : 稀有度公告（重组阶段显示稀有度等级文字）
     const cfg=currentRarityCfg;
     const rarityLabel=cfg.labelCN||'';
     showToast('✦ '+(cfg.label||'')+' '+rarityLabel+' ✦');
@@ -2455,11 +2455,11 @@ function finishExplode(){
   for(let layer=1;layer<currentRarityCfg.shockwaveLayers;layer++){
     setTimeout(()=>{if(state===State.REFORMING){prizeShockwave.userData.radius=0;prizeShockwave.userData.active=true;prizeShockwave.material.opacity=1-layer*0.25;}},layer*200);
   }
-  // V36: 传说/稀有级激活光柱
+  // : 传说/稀有级激活光柱
   if(currentRarityCfg.lightPillars>0&&prizeLightPillars){
     activateLightPillars(selectedPrize,currentRarityCfg.lightPillars,currentRarityCfg.pillarHeight);
   }
-  // V37: 激活能量汇聚环（传说5环/稀有3环/普通1环）
+  // : 激活能量汇聚环（传说5环/稀有3环/普通1环）
   if(prizeConvergeRings){
     const numRings=selectedPrize.rarity==='legendary'?5:selectedPrize.rarity==='rare'?3:1;
     activateConvergeRings(selectedPrize,numRings);
@@ -2467,7 +2467,7 @@ function finishExplode(){
   playSound('reform');
 }
 
-// V36: 光柱激活——从文字板位置向上/下射出光线粒子
+// : 光柱激活——从文字板位置向上/下射出光线粒子
 function activateLightPillars(prize,numPillars,pillarH){
   const pArr=prizeLightPillars.geometry.attributes.position.array;
   const cArr=prizeLightPillars.geometry.attributes.color.array;
@@ -2497,18 +2497,18 @@ function finishReform(){
   controls.enabled=true;controls.autoRotate=true;
   controls.autoRotateSpeed=cfg.autoRotateSpeed;
   controls.minDistance=3;controls.maxDistance=25;
-  // V41: 传说级使用专属音效
+  // : 传说级使用专属音效
   playSound(cfg.audioReveal||'reveal');
   hudTl.innerHTML='';hudTr.innerHTML='';hudBl.innerHTML='';
   if(selectedPrize)showPrizeOverlay(selectedPrize);
   prizeFadeOut=false;
-  // V41: 传说级相机拉更近
+  // : 传说级相机拉更近
   if(selectedPrize&&selectedPrize.rarity==='legendary'){
     controls.minDistance=2.0;
   }else if(selectedPrize&&selectedPrize.rarity==='rare'){
     controls.minDistance=2.8;
   }
-  // V41: 等级化展示时长
+  // : 等级化展示时长
   clearTimeout(autoResetTimer);
   const showDuration=cfg.showDuration*1000;
   autoResetTimer=setTimeout(()=>{if(state===State.PRIZE_SHOWN)resetAll();},showDuration);
@@ -2516,7 +2516,7 @@ function finishReform(){
   if(cfg.auroraRings>0&&prizeSparkles){
     activateSparkles(selectedPrize);
   }
-  // V41: 激活粒子皇冠（传说/稀有级）
+  // : 激活粒子皇冠（传说/稀有级）
   if(prizeCrown&&(selectedPrize.rarity==='legendary'||selectedPrize.rarity==='rare')){
     activateCrown(selectedPrize);
   }
@@ -2525,14 +2525,14 @@ function finishReform(){
     activateHoloRings(selectedPrize);
     prizeHoloRings.material.opacity=selectedPrize.rarity==='legendary'?0.9:selectedPrize.rarity==='rare'?0.6:0.4;
   }
-  // V41: 激活粒子喷泉（传说级更壮观）
+  // : 激活粒子喷泉（传说级更壮观）
   if(prizeFountain){
     activateFountain(selectedPrize);
   }
   el('gi-state').textContent='';
 }
 
-// V36: 火花激活——展示时火花雨
+// : 火花激活——展示时火花雨
 function activateSparkles(prize){
   const sArr=prizeSparkles.geometry.attributes.position.array;
   const cArr=prizeSparkles.geometry.attributes.color.array;
@@ -2559,28 +2559,28 @@ function resetAll(){
   controls.enabled=true;controls.autoRotate=true;controls.autoRotateSpeed=0.35;
   controls.minDistance=4;controls.maxDistance=18;
   hidePrizeOverlay();
-  // V35: 隐藏3D文字板
+  // : 隐藏3D文字板
   if(prizeBillboard){prizeBillboard.visible=false;prizeBillboard.material.opacity=0;}
   // 恢复粒子 opacity
   prizeSystem.material.opacity=1;prizeBorder.material.opacity=0.8;prizeSwirl.material.opacity=0.6;prizeScan.material.opacity=0.9;prizeDataStreams.material.opacity=0.6;
   prizeSystem.visible=false;prizeBorder.visible=false;prizeSwirl.visible=false;prizeScan.visible=false;
   prizeShockwave.visible=false;prizeShockwave.userData.active=false;
   prizeDataStreams.visible=false;
-  // V32: 清理碎裂碎片
+  // : 清理碎裂碎片
   for(const s of shardMeshes){s.visible=false;s.material.opacity=0;s.userData.active=false;}
-  // V32: 清理涡流粒子
+  // : 清理涡流粒子
   vortexParticles.visible=false;vortexParticles.material.opacity=0;
-  // V36: 清理光柱和火花
+  // : 清理光柱和火花
   if(prizeLightPillars){prizeLightPillars.visible=false;prizeLightPillars.material.opacity=0;pillarData.length=0;}
   if(prizeSparkles){prizeSparkles.visible=false;prizeSparkles.material.opacity=0;}
-  // V37: 清理汇聚环和皇冠
+  // : 清理汇聚环和皇冠
   if(prizeConvergeRings){prizeConvergeRings.visible=false;prizeConvergeRings.material.opacity=0;
     for(let r=0;r<CONVERGE_RINGS_MAX;r++)convergeRingData[r].active=false;}
   if(prizeCrown){prizeCrown.visible=false;prizeCrown.material.opacity=0;}
-  // V38: 清理全息光环
+  // : 清理全息光环
   if(prizeHoloRings){prizeHoloRings.visible=false;prizeHoloRings.material.opacity=0;
     for(let r=0;r<HOLO_RINGS_COUNT;r++)holoRingData[r].active=false;}
-  // V40: 清理粒子喷泉
+  // : 清理粒子喷泉
   if(prizeFountain){prizeFountain.visible=false;prizeFountain.material.opacity=0;}
   showGuide();updateConstellationPanel();
   el('gi-state').textContent='';
@@ -2590,7 +2590,7 @@ function resetAll(){
 let toastTimer=null;
 function showToast(msg){toastEl.textContent=msg;toastEl.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),1500);}
 function showFlash(){flashOverlay.classList.add('active');setTimeout(()=>flashOverlay.classList.remove('active'),400);}
-// V37: 稀有度彩色闪光（爆炸时使用）
+// : 稀有度彩色闪光（爆炸时使用）
 function showRarityFlash(prize){
   const cfg=getRarityCfg(prize);
   const color=cfg.color||'#ffd740';
@@ -2600,26 +2600,26 @@ function showRarityFlash(prize){
 }
 function showGuide(){guideOverlay.classList.add('active');}
 function hideGuide(){guideOverlay.classList.remove('active');}
-// ==================== V34 奖品展示面板（纯HTML，超清晰） ====================
-function drawPrizeCard(prize){/* V34: canvas卡片已废弃，改用纯HTML面板 */}
+// ==================== 奖品展示面板（纯HTML，超清晰） ====================
+function drawPrizeCard(prize){/* : canvas卡片已废弃，改用纯HTML面板 */}
 
 function showPrizeOverlay(prize){
-  // V41: 记录中奖历史
+  // : 记录中奖历史
   addHistory(prize);
 
   generatePrizeTargets(prize);
-  // V35: 渲染3D画布文字板，像素级清晰
+  // : 渲染3D画布文字板，像素级清晰
   renderPrizeBillboard(prize);
   if(prizeBillboard){prizeBillboard.visible=true;prizeBillboard.material.opacity=0;}
   const cfg=getRarityCfg(prize);
   const pc=prize.color||'#40c4ff';
 
-  // V41: 卡片光晕颜色 —— 等级差异化
+  // : 卡片光晕颜色 —— 等级差异化
   if(prizeCardGlow)prizeCardGlow.style.background='radial-gradient(ellipse at center,'+cfg.color+cfg.bgGlowAlpha+',transparent 70%)';
   // 角标颜色
   document.querySelectorAll('#prize-card-corner').forEach(c=>c.style.borderColor=cfg.color+'80');
 
-  // V41: 奖品名称 —— 等级差异化字号+光晕
+  // : 奖品名称 —— 等级差异化字号+光晕
   prizeCardName.textContent=prize.name||'???';
   prizeCardName.style.color='#fff';
   prizeCardName.style.fontSize=cfg.titleSize||'36px';
@@ -2633,7 +2633,7 @@ function showPrizeOverlay(prize){
     prizeCardName.style.textShadow='0 0 20px '+pc+', 0 0 40px '+pc+'60';
   }
 
-  // V41: 稀有度标签 —— 等级差异化
+  // : 稀有度标签 —— 等级差异化
   prizeCardRarity.textContent=cfg.labelCN;
   prizeCardRarity.style.color=cfg.color;
   prizeCardRarity.style.borderColor=cfg.color+'60';
@@ -2657,7 +2657,7 @@ function showPrizeOverlay(prize){
   prizeCardDesc.textContent=prize.desc||'';
   prizeCardDesc.style.color='rgba(220,235,255,0.85)';
 
-  // V41: 图片奖品显示
+  // : 图片奖品显示
   if(prize.image){
     const img=prizeCardImage;
     img.src=prize.image;
@@ -2668,7 +2668,7 @@ function showPrizeOverlay(prize){
     prizeCardImage.style.display='none';
   }
 
-  // V41: 卡片主面板等级化光晕
+  // : 卡片主面板等级化光晕
   const cardMain = el('prize-card-main');
   if(cardMain){
     cardMain.classList.remove('legendary-glow','rare-glow','common-glow');
@@ -2702,7 +2702,7 @@ function playSound(type){
       case'reform':osc.type='sine';osc.frequency.setValueAtTime(500,ctx.currentTime);osc.frequency.exponentialRampToValueAtTime(1200,ctx.currentTime+0.8);gain.gain.setValueAtTime(0.06,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.8);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.8);break;
       case'reveal':osc.type='triangle';osc.frequency.setValueAtTime(800,ctx.currentTime);osc.frequency.exponentialRampToValueAtTime(1600,ctx.currentTime+0.3);gain.gain.setValueAtTime(0.1,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.5);break;
       case'tick':osc.type='sine';osc.frequency.setValueAtTime(1200,ctx.currentTime);gain.gain.setValueAtTime(0.04,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.06);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.06);break;
-      // V41: 传说级揭晓音效 —— 上升和弦
+      // : 传说级揭晓音效 —— 上升和弦
       case'legendary':osc.type='triangle';osc.frequency.setValueAtTime(600,ctx.currentTime);osc.frequency.setValueAtTime(900,ctx.currentTime+0.15);osc.frequency.setValueAtTime(1200,ctx.currentTime+0.3);osc.frequency.exponentialRampToValueAtTime(2400,ctx.currentTime+0.6);gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.8);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.8);break;
     }}catch(e){}
 }
@@ -2920,7 +2920,7 @@ function animate(){
   }
   dustGeo.attributes.position.needsUpdate=true;
 
-  // V32 极光波动动画
+  // 极光波动动画
   for(const ap of auroraPlanes){
     ap.obj.position.y+=Math.sin(totalTime*ap.waveSpeed+ap.wavePhase)*dt*0.3;
     ap.obj.rotation.z+=dt*ap.speed;
@@ -2929,7 +2929,7 @@ function animate(){
     ap.obj.position.x+=Math.sin(totalTime*0.2+ap.wavePhase*2)*dt*0.1;
   }
 
-  // V32 星系旋臂缓慢旋转
+  // 星系旋臂缓慢旋转
   for(const arm of spiralArms){arm.rotation.y+=dt*0.008;}
 
   // 流星系统
@@ -3121,7 +3121,7 @@ function animate(){
       quantumSparks.material.opacity=0.5+Math.sin(totalTime*3)*0.2;
     }
 
-    // ---- V40: 色散光晕动画（RGB分离旋转，产生色彩偏移效果） ----
+    // ---- : 色散光晕动画（RGB分离旋转，产生色彩偏移效果） ----
     if(chromaHalo){
       chromaHalo.rotation.y+=dt*0.8;
       chromaHalo.rotation.x+=dt*0.3;
@@ -3129,7 +3129,7 @@ function animate(){
       chromaHalo.material.size=0.08+Math.sin(totalTime*3)*0.03;
     }
 
-    // ---- V40: 大气粒子动画（缓慢漂浮+微闪） ----
+    // ---- : 大气粒子动画（缓慢漂浮+微闪） ----
     if(atmosDust){
       const adArr=atmosDust.geometry.attributes.position.array;
       for(let i=0;i<ATMOS_PARTICLES;i++){
@@ -3146,7 +3146,7 @@ function animate(){
       atmosDust.material.opacity=0.3+Math.sin(totalTime*1.8)*0.08;
     }
 
-    // ---- V32 核心脉冲波动画 ----
+    // ---- 核心脉冲波动画 ----
     nextPulseTime-=dt;
     if(nextPulseTime<=0){
       for(const pw of pulseWaves){
@@ -3175,7 +3175,7 @@ function animate(){
       if(p>=1){pw.visible=false;}
     }
 
-    // ---- V32 能量网络连线动画 ----
+    // ---- 能量网络连线动画 ----
     if(shellPoints){
       const shellArr=shellPoints.geometry.attributes.position.array;
       const shellCount=shellPoints.geometry.attributes.position.count;
@@ -3237,9 +3237,9 @@ function animate(){
         prizeSystem.geometry.attributes.position.needsUpdate=true;
       }
       updateProgressRing(animProgress);
-      // V32 碎裂碎片更新
+      // 碎裂碎片更新
       updateShardAnimation(dt);
-      // V32 涡流粒子（爆炸阶段：螺旋散开）
+      // 涡流粒子（爆炸阶段：螺旋散开）
       if(vortexParticles&&vortexParticles.visible){
         const vArr=vortexParticles.geometry.attributes.position.array;
         for(let i=0;i<VORTEX_PARTICLES;i++){
@@ -3254,7 +3254,7 @@ function animate(){
         vortexParticles.geometry.attributes.position.needsUpdate=true;
         vortexParticles.material.opacity=0.6*(1-animProgress*0.5);
       }
-      // V40: 超新星冲击环动画 —— 从球心向外扩散的亮环，随爆炸进度衰减
+      // : 超新星冲击环动画 —— 从球心向外扩散的亮环，随爆炸进度衰减
       if(prizeShockwave&&prizeShockwave.userData.supernovaPhase!==undefined){
         const sn=prizeShockwave.userData;
         sn.supernovaPhase+=dt*2;
@@ -3275,7 +3275,7 @@ function animate(){
           delete sn.supernovaPhase;
         }
       }
-      // V36: 传说级二次爆炸——在爆炸进度50%时触发额外碎片散射
+      // : 传说级二次爆炸——在爆炸进度50%时触发额外碎片散射
       if(currentRarityCfg.splitExplosion&&!splitTriggered&&animProgress>=currentRarityCfg.splitTiming){
         splitTriggered=true;
         triggerShatterEffect();
@@ -3300,9 +3300,9 @@ function animate(){
         if(scanSource){const ts=easeOutCubic(animProgress);for(let i=0;i<PRIZE_SCAN_PARTICLES;i++){const i3=i*3;prizeScanPos[i3]=lerp(scanSource[i3],scanTargetPos[i3],ts);prizeScanPos[i3+1]=lerp(scanSource[i3+1],scanTargetPos[i3+1],ts);prizeScanPos[i3+2]=lerp(scanSource[i3+2],scanTargetPos[i3+2],ts);}prizeScan.geometry.attributes.position.needsUpdate=true;}
       }
       updateProgressRing(animProgress);
-      // V32 碎裂碎片继续更新（逐渐消失）
+      // 碎裂碎片继续更新（逐渐消失）
       updateShardAnimation(dt);
-      // V32 涡流粒子（重组阶段：螺旋汇聚到文字位置）
+      // 涡流粒子（重组阶段：螺旋汇聚到文字位置）
       if(vortexParticles&&vortexParticles.visible){
         const vArr=vortexParticles.geometry.attributes.position.array;
         for(let i=0;i<VORTEX_PARTICLES;i++){
@@ -3321,7 +3321,7 @@ function animate(){
         vortexParticles.geometry.attributes.position.needsUpdate=true;
         vortexParticles.material.opacity=0.5*(1-animProgress*0.7);
       }
-      // V36: 光柱动画——重组时光柱从文字板向外扩散
+      // : 光柱动画——重组时光柱从文字板向外扩散
       if(prizeLightPillars&&prizeLightPillars.visible){
         const pArr=prizeLightPillars.geometry.attributes.position.array;
         for(let i=0;i<pillarData.length;i++){
@@ -3338,7 +3338,7 @@ function animate(){
         prizeLightPillars.geometry.attributes.position.needsUpdate=true;
         prizeLightPillars.material.opacity=Math.max(0,prizeLightPillars.material.opacity-dt*0.1);
       }
-      // V37: 能量汇聚环动画——多环从外向内收缩汇聚
+      // : 能量汇聚环动画——多环从外向内收缩汇聚
       if(prizeConvergeRings&&prizeConvergeRings.visible){
         const cArr=prizeConvergeRings.geometry.attributes.position.array;
         let anyActive=false;
@@ -3364,7 +3364,7 @@ function animate(){
       }
       break;
     case State.PRIZE_SHOWN:
-      // V35: 3D画布文字板淡入+缩放动画（像素级清晰文字）
+      // : 3D画布文字板淡入+缩放动画（像素级清晰文字）
       if(prizeBillboard&&prizeBillboard.visible){
         const targetOpacity=0.92;
         prizeBillboard.material.opacity=Math.min(targetOpacity,prizeBillboard.material.opacity+dt*2.5);
@@ -3386,7 +3386,7 @@ function animate(){
         prizeSwirl.material.opacity=Math.max(0.12,prizeSwirl.material.opacity-dt*0.8);
         prizeDataStreams.material.opacity=Math.max(0.08,prizeDataStreams.material.opacity-dt*0.5);
       }
-      // V33: 极微呼吸（降低抖动幅度提高文字稳定性）
+      // : 极微呼吸（降低抖动幅度提高文字稳定性）
       for(let i=0;i<PRIZE_PARTICLES;i++){const i3=i*3;prizePos[i3]=prizeTargetPos[i3]+Math.sin(totalTime*2+i*0.3)*0.003;prizePos[i3+1]=prizeTargetPos[i3+1]+Math.cos(totalTime*1.8+i*0.3)*0.003;prizePos[i3+2]=prizeTargetPos[i3+2]+Math.sin(totalTime*2.5+i*0.2)*0.002;}
       prizeSystem.geometry.attributes.position.needsUpdate=true;
       // HUD 动态数据更新
@@ -3440,7 +3440,7 @@ function animate(){
         prizeDataStreams.geometry.attributes.position.needsUpdate=true;
         prizeDataStreams.material.opacity=0.3+Math.sin(totalTime*1.5)*0.15;
       }
-      // V36: 火花动画——传说/稀有级展示时火花雨
+      // : 火花动画——传说/稀有级展示时火花雨
       if(prizeSparkles&&prizeSparkles.visible){
         const sArr=prizeSparkles.geometry.attributes.position.array;
         let anyAlive=false;
@@ -3460,7 +3460,7 @@ function animate(){
         prizeSparkles.geometry.attributes.position.needsUpdate=true;
         prizeSparkles.material.opacity=Math.max(0,prizeSparkles.material.opacity-dt*0.15);
       }
-      // V37: 粒子皇冠动画——奖品上方旋转粒子环
+      // : 粒子皇冠动画——奖品上方旋转粒子环
       if(prizeCrown&&prizeCrown.visible){
         const crArr=prizeCrown.geometry.attributes.position.array;
         let anyCrownAlive=false;
@@ -3479,7 +3479,7 @@ function animate(){
         prizeCrown.geometry.attributes.position.needsUpdate=true;
         prizeCrown.material.opacity=Math.max(0,prizeCrown.material.opacity-dt*0.1);
       }
-      // V38: 全息光环动画——公告板周围旋转的全息环
+      // : 全息光环动画——公告板周围旋转的全息环
       if(prizeHoloRings&&prizeHoloRings.visible){
         const hArr=prizeHoloRings.geometry.attributes.position.array;
         let anyHoloActive=false;
@@ -3509,7 +3509,7 @@ function animate(){
         prizeHoloRings.geometry.attributes.position.needsUpdate=true;
         prizeHoloRings.material.opacity=Math.max(0,prizeHoloRings.material.opacity-dt*0.08);
       }
-      // V40: 粒子喷泉动画 —— 粒子从下方喷涌上升，到达顶部后重置
+      // : 粒子喷泉动画 —— 粒子从下方喷涌上升，到达顶部后重置
       if(prizeFountain&&prizeFountain.visible){
         const fArr=prizeFountain.geometry.attributes.position.array;
         let anyFountainAlive=false;
@@ -3529,7 +3529,7 @@ function animate(){
         prizeFountain.geometry.attributes.position.needsUpdate=true;
         prizeFountain.material.opacity=Math.max(0,prizeFountain.material.opacity-dt*0.06);
       }
-      // V38: 公告板扫描线动画
+      // : 公告板扫描线动画
       updateBillboardScanlines(totalTime);
       break;
   }
