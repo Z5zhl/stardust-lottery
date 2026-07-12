@@ -455,7 +455,7 @@
       return Promise.reject(new Error('浏览器不支持摄像头（需HTTPS或localhost）'));
     }
 
-    // 多级摄像头约束，从理想到最宽松
+    // 多级摄像头约束，从理想到最宽松（每级5秒超时）
     var constraintLevels = [
       { label: '高清', video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } },
       { label: '标清', video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: 'user' } },
@@ -471,10 +471,10 @@
       self._gestureLabel.textContent = '打开摄像头(' + level.label + ')...';
 
       return new Promise(function(resolve, reject) {
-        // 10秒超时（每个级别）
+        // 5秒超时（每个级别），总计最多20秒
         var timeoutId = setTimeout(function() {
-          reject(new Error('CAM:摄像头启动超时（10秒），请检查权限弹窗'));
-        }, 10000);
+          reject(new Error('CAM:摄像头启动超时（5秒），请检查权限弹窗'));
+        }, 5000);
 
         navigator.mediaDevices.getUserMedia(level)
           .then(function(stream) {
