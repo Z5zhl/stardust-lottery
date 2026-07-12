@@ -1,0 +1,23 @@
+# 服务器文件（本地开发用，部署时排除）
+server.js
+启动服务器.bat
+使用说明.txt
+
+# 临时文件
+*.tmp
+*.log
+
+# 系统文件
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 上传/项目缓存
+.uploads/
+projects/

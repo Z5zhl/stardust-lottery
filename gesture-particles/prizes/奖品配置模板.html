@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>奖品配置模板 - 星尘抽奖 V46</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+    background: #0a0f1a;
+    color: #c8d6e5;
+    padding: 40px;
+    line-height: 1.8;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    color: #ffd740;
+    font-size: 28px;
+    margin-bottom: 8px;
+    text-shadow: 0 0 30px rgba(255, 215, 64, 0.4);
+  }
+  .subtitle {
+    text-align: center;
+    color: #80d8ff;
+    font-size: 14px;
+    margin-bottom: 30px;
+    opacity: 0.8;
+  }
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .card h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .card.legendary h2 { color: #ffd740; }
+  .card.rare h2 { color: #80d8ff; }
+  .card.common h2 { color: #b0bec5; }
+  .card.rule h2 { color: #69f0ae; }
+
+  .example {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 15px;
+    position: relative;
+    border-left: 3px solid;
+  }
+  .example.txt { border-left-color: #69f0ae; }
+  .example.img { border-left-color: #ff8a65; }
+  .example .label {
+    position: absolute;
+    top: -10px;
+    right: 12px;
+    padding: 2px 12px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-family: "Microsoft YaHei", sans-serif;
+    font-weight: bold;
+  }
+  .example.txt .label { background: #69f0ae; color: #000; }
+  .example.img .label { background: #ff8a65; color: #000; }
+
+  .explain {
+    font-size: 13px;
+    color: #8899aa;
+    margin-top: 6px;
+    padding-left: 4px;
+  }
+  .explain span { color: #ffd740; font-weight: bold; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  th {
+    background: rgba(255,255,255,0.05);
+    color: #80d8ff;
+    font-weight: bold;
+    font-size: 13px;
+  }
+  td:first-child { font-family: "Consolas", monospace; color: #69f0ae; }
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .tag.legendary { background: #ffd74022; color: #ffd740; border: 1px solid #ffd74044; }
+  .tag.rare { background: #80d8ff22; color: #80d8ff; border: 1px solid #80d8ff44; }
+  .tag.common { background: #b0bec522; color: #b0bec5; border: 1px solid #b0bec544; }
+
+  .note {
+    background: rgba(255, 215, 64, 0.08);
+    border: 1px solid rgba(255, 215, 64, 0.2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .note strong { color: #ffd740; }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 10px 0;
+  }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    background: #ffd740;
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .current-files {
+    font-size: 13px;
+    color: #8899aa;
+    margin-top: 8px;
+  }
+  .current-files code {
+    color: #80d8ff;
+    background: rgba(128,216,255,0.1);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>✦ 星尘抽奖 · 奖品配置模板</h1>
+<p class="subtitle">V46 — 文件名即一切，零配置文件</p>
+
+<!-- ===== 核心规则 ===== -->
+<div class="card rule">
+  <h2>📋 核心规则（一句话）</h2>
+  <p style="font-size:18px;text-align:center;padding:10px 0;color:#ffd740;">
+    <strong>把文件放到 <code style="background:rgba(255,215,64,0.15);padding:2px 8px;border-radius:4px;">gesture-particles/prizes/</code> 文件夹，按格式命名 → 刷新页面 → 搞定</strong>
+  </p>
+</div>
+
+<!-- ===== 命名格式 ===== -->
+<div class="card rule">
+  <h2>🔤 命名格式</h2>
+
+  <p style="font-size:30px;text-align:center;padding:16px;color:#ffd740;font-family:Consolas,monospace;letter-spacing:2px;">
+    <strong style="color:#69f0ae;">权重</strong>.<strong style="color:#80d8ff;">奖品名</strong>.<strong style="color:#ff8a65;">扩展名</strong>
+  </p>
+  <p style="text-align:center;color:#8899aa;font-size:14px;">可选后缀：<code style="color:#ff8a65;">_xN</code> 表示最多抽中 N 次</p>
+</div>
+
+<!-- ===== 文字奖品 ===== -->
+<div class="card">
+  <h2 style="color:#69f0ae;">📝 文字奖品（.txt）</h2>
+
+  <div class="example txt">
+    <span class="label">文件名</span>
+    <strong>3.鸿运当头.txt</strong>
+  </div>
+  <div class="explain">→ 权重=<span>3</span>（传说级），不限次数</div>
+
+  <div style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.3);border-radius:6px;">
+    <p style="font-size:13px;color:#8899aa;margin-bottom:6px;">📄 文件内容（第一行是描述，显示在卡片上）：</p>
+    <pre style="color:#69f0ae;font-family:Consolas,monospace;font-size:14px;">大吉大利，今日运势极佳，万事顺遂！
+
+第二行可以作为更多描述
+第三行也可以继续写</pre>
+  </div>
+
+  <div class="explain" style="margin-top:10px;">💡 文件内容的第一行会作为奖品描述显示在弹出卡片上</div>
+</div>
+
+<!-- ===== 图片奖品 ===== -->
+<div class="card">
+  <h2 style="color:#ff8a65;">🖼️ 图片奖品（.png / .jpg / .webp / .gif）</h2>
+
+  <div class="example img">
+    <span class="label">文件名</span>
+    <strong>3.神秘大礼.png</strong>
+  </div>
+  <div class="explain">→ 权重=<span>3</span>（传说级），不限次数，图片直接展示</div>
+
+  <div class="example img" style="margin-top:16px;">
+    <span class="label">文件名</span>
+    <strong>5.星辰大海.png</strong>
+  </div>
+  <div class="explain">→ 权重=<span>5</span>（稀有级），不限次数</div>
+
+  <div class="explain" style="margin-top:10px;">💡 图片奖品会在 3D 粒子球和弹出卡片两个位置展示</div>
+</div>
+
+<!-- ===== 次数限制 ===== -->
+<div class="card rule">
+  <h2>🔢 次数限制（可选）</h2>
+
+  <div class="example" style="border-left-color:#ff8a65;">
+    <span class="label" style="background:#ff8a65;">文件名</span>
+    <strong>8.心想事成_x2.txt</strong>
+  </div>
+  <div class="explain">→ 权重=<span>8</span>（普通级），最多抽中 <span>2</span> 次，抽完后自动移出奖池</div>
+
+  <div class="example" style="border-left-color:#ff8a65;margin-top:16px;">
+    <span class="label" style="background:#ff8a65;">文件名</span>
+    <strong>5.限量福袋_x3.png</strong>
+  </div>
+  <div class="explain">→ 权重=<span>5</span>（稀有级），图片奖品，最多抽中 <span>3</span> 次</div>
+</div>
+
+<!-- ===== 权重与稀有度 ===== -->
+<div class="card rule">
+  <h2>⚖️ 权重 → 稀有度自动映射</h2>
+
+  <table>
+    <tr><th>权重范围</th><th>稀有度</th><th>标签</th><th>说明</th></tr>
+    <tr><td>1 ~ 4</td><td><span class="tag legendary">传说</span></td><td>★</td><td>金色特效，概率最低，最稀有</td></tr>
+    <tr><td>5 ~ 7</td><td><span class="tag rare">稀有</span></td><td>✦</td><td>蓝色特效，概率中等</td></tr>
+    <tr><td>8 以上</td><td><span class="tag common">普通</span></td><td>·</td><td>灰色特效，概率最高，最容易中</td></tr>
+  </table>
+  <p class="explain" style="margin-top:10px;">💡 权重越大越容易中，越小越稀有。权重相同的奖品中奖概率相同。</p>
+</div>
+
+<!-- ===== 快速上手 ===== -->
+<div class="card rule">
+  <h2>🚀 三步上手</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div>
+      <strong>准备文件</strong><br>
+      <span style="color:#8899aa;">文字奖品：创建 .txt 文件，第一行写奖品描述<br>图片奖品：准备 .png / .jpg 等图片文件</span>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div>
+      <strong>按格式命名</strong><br>
+      <span style="color:#8899aa;">格式：<code style="color:#69f0ae;">权重.奖品名.扩展名</code><br>
+      示例：<code style="color:#69f0ae;">5.升职加薪.txt</code> 或 <code style="color:#ff8a65;">3.大奖.png</code></span>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div>
+      <strong>放入文件夹并刷新页面</strong><br>
+      <span style="color:#8899aa;">将文件放入 <code style="color:#80d8ff;">gesture-particles/prizes/</code> 文件夹<br>刷新页面（F5）即可生效</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 当前奖品 ===== -->
+<div class="card">
+  <h2 style="color:#80d8ff;">📦 当前奖品池（12个）</h2>
+
+  <table>
+    <tr><th>文件名</th><th>名称</th><th>权重</th><th>稀有度</th><th>类型</th><th>次数限制</th></tr>
+    <tr><td>3.财源广进.txt</td><td>财源广进</td><td>3</td><td><span class="tag legendary">传说</span></td><td>文字</td><td>不限</td></tr>
+    <tr><td>3.鸿运当头.txt</td><td>鸿运当头</td><td>3</td><td><span class="tag legendary">传说</span></td><td>文字</td><td>不限</td></tr>
+    <tr><td>3.神秘大礼.png</td><td>神秘大礼</td><td>3</td><td><span class="tag legendary">传说</span></td><td>图片</td><td>不限</td></tr>
+    <tr><td>5.一帆风顺.txt</td><td>一帆风顺</td><td>5</td><td><span class="tag rare">稀有</span></td><td>文字</td><td>不限</td></tr>
+    <tr><td>5.事业腾飞.txt</td><td>事业腾飞</td><td>5</td><td><span class="tag rare">稀有</span></td><td>文字</td><td>不限</td></tr>
+    <tr><td>5.星辰大海.png</td><td>星辰大海</td><td>5</td><td><span class="tag rare">稀有</span></td><td>图片</td><td>不限</td></tr>
+    <tr><td>5.桃花朵朵.txt</td><td>桃花朵朵</td><td>5</td><td><span class="tag rare">稀有</span></td><td>文字</td><td>不限</td></tr>
+    <tr><td>8.学业有成.txt</td><td>学业有成</td><td>8</td><td><span class="tag common">普通</span></td><td>文字</td><td>不限</td></tr>
+    <tr><td>8.家庭和睦.txt</td><td>家庭和睦</td><td>8</td><td><span class="tag common">普通</span></td><td>文字</td><td>不限</td></tr>
+    <tr><td>8.平安喜乐.txt</td><td>平安喜乐</td><td>8</td><td><span class="tag common">普通</span></td><td>文字</td><td>不限</td></tr>
+    <tr><td>8.心想事成_x2.txt</td><td>心想事成</td><td>8</td><td><span class="tag common">普通</span></td><td>文字</td><td>最多2次</td></tr>
+    <tr><td>8.贵人相助.txt</td><td>贵人相助</td><td>8</td><td><span class="tag common">普通</span></td><td>文字</td><td>不限</td></tr>
+  </table>
+</div>
+
+<!-- ===== 注意事项 ===== -->
+<div class="note">
+  <strong>⚠️ 注意事项</strong><br>
+  · 文件名中的 <strong>数字</strong> 和 <strong>点号</strong> 必须保留（如 <code>3.鸿运当头.txt</code>）<br>
+  · 只支持 <code>.txt</code>（文字）和 <code>.png/.jpg/.webp/.gif/.bmp</code>（图片）<br>
+  · 修改文件名后刷新页面（F5）立即生效，无需重启服务器<br>
+  · 删除文件同样刷新页面生效<br>
+  · 按 <strong>R 键</strong> 重置所有次数限制和抽奖状态
+</div>
+
+</div>
+</body>
+</html>
