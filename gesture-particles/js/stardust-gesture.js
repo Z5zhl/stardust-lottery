@@ -188,6 +188,16 @@
       'letter-spacing:0.1em;pointer-events:none;';
     this._gestureLabel.textContent = '等待手势...';
     this._previewWrap.appendChild(this._gestureLabel);
+
+    // 摄像头状态指示灯（预览区右上角）
+    this._cameraIndicator = document.createElement('div');
+    this._cameraIndicator.id = 'sg-camera-indicator';
+    this._cameraIndicator.style.cssText =
+      'position:absolute;top:6px;right:8px;width:8px;height:8px;border-radius:50%;' +
+      'background:rgba(255,100,100,0.6);box-shadow:0 0 6px rgba(255,100,100,0.4);' +
+      'transition:background 0.3s,box-shadow 0.3s;pointer-events:none;z-index:2;';
+    this._cameraIndicator.title = '摄像头状态';
+    this._previewWrap.appendChild(this._cameraIndicator);
     this._uiRoot.appendChild(this._previewWrap);
 
     // 状态栏
@@ -294,6 +304,12 @@
     if (this._uiRoot) {
       this._uiRoot.remove();
       this._uiRoot = null;
+    }
+
+    // 重置摄像头指示灯
+    if (this._cameraIndicator) {
+      this._cameraIndicator.style.background = 'rgba(255,100,100,0.6)';
+      this._cameraIndicator.style.boxShadow = '0 0 6px rgba(255,100,100,0.4)';
     }
 
     // 重置状态
@@ -429,7 +445,7 @@
   };
 
   /* ================================================================
-   *  摄像头
+   *  摄像头（宽松约束 + 多级fallback + 状态反馈）
    * ================================================================ */
   StardustGesture.prototype._startCamera = function() {
     var self = this;
@@ -439,46 +455,91 @@
       return Promise.reject(new Error('浏览器不支持摄像头（需HTTPS或localhost）'));
     }
 
-    // 15秒超时：防止权限弹窗被忽略时无限等待
-    var timeoutId;
-    var timeoutPromise = new Promise(function(_, reject) {
-      timeoutId = setTimeout(function() {
-        reject(new Error('摄像头启动超时，请检查权限弹窗'));
-      }, 15000);
-    });
+    // 多级摄像头约束，从理想到最宽松
+    var constraintLevels = [
+      { label: '高清', video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' } },
+      { label: '标清', video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: 'user' } },
+      { label: '基础', video: { facingMode: 'user' } },
+      { label: '任意', video: true }
+    ];
 
-    return Promise.race([
-      timeoutPromise,
-      navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480, facingMode: 'user' }
-      })
-    ]).then(function(stream) {
-      clearTimeout(timeoutId);
+    function tryConstraint(levelIdx) {
+      if (levelIdx >= constraintLevels.length) {
+        return Promise.reject(new Error('CAM:所有分辨率尝试失败'));
+      }
+      var level = constraintLevels[levelIdx];
+      self._gestureLabel.textContent = '打开摄像头(' + level.label + ')...';
+
+      return new Promise(function(resolve, reject) {
+        // 10秒超时（每个级别）
+        var timeoutId = setTimeout(function() {
+          reject(new Error('CAM:摄像头启动超时（10秒），请检查权限弹窗'));
+        }, 10000);
+
+        navigator.mediaDevices.getUserMedia(level)
+          .then(function(stream) {
+            clearTimeout(timeoutId);
+            resolve(stream);
+          })
+          .catch(function(err) {
+            clearTimeout(timeoutId);
+            var name = err.name || '';
+            // 权限类和设备类错误不重试，直接抛出
+            if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+              reject(new Error('CAM:摄像头权限被拒绝，请在浏览器设置中允许'));
+              return;
+            }
+            if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+              reject(new Error('CAM:未检测到摄像头设备'));
+              return;
+            }
+            if (name === 'NotReadableError' || name === 'TrackStartError') {
+              reject(new Error('CAM:摄像头被其他应用占用，请关闭其他使用摄像头的程序'));
+              return;
+            }
+            // 分辨率/约束不匹配 → 尝试下一级
+            console.warn('[StardustGesture] 摄像头约束(' + level.label + ')失败:', name, '尝试下一级');
+            tryConstraint(levelIdx + 1).then(resolve, reject);
+          });
+      });
+    }
+
+    return tryConstraint(0).then(function(stream) {
       self._stream = stream;
       self._videoEl = document.createElement('video');
       self._videoEl.setAttribute('playsinline', '');
       self._videoEl.setAttribute('autoplay', '');
       self._videoEl.setAttribute('muted', '');
       self._videoEl.srcObject = stream;
-      return self._videoEl.play();
-    }).then(function() {
-      self._ctx = self._canvasEl.getContext('2d');
+      return self._videoEl.play().then(function() {
+        self._ctx = self._canvasEl.getContext('2d');
+        // 绘制首帧到预览区，让用户看到摄像头已工作
+        self._drawCameraFrame();
+        self._gestureLabel.textContent = '摄像头已就绪';
+        // 点亮摄像头指示灯为绿色
+        if (self._cameraIndicator) {
+          self._cameraIndicator.style.background = 'rgba(64,255,128,0.8)';
+          self._cameraIndicator.style.boxShadow = '0 0 8px rgba(64,255,128,0.6)';
+        }
+      });
     }).catch(function(err) {
-      // 友好的中文错误提示
-      var name = err.name || '';
-      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-        throw new Error('摄像头权限被拒绝，请在浏览器设置中允许');
-      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
-        throw new Error('未检测到摄像头设备');
-      } else if (name === 'NotReadableError' || name === 'TrackStartError') {
-        throw new Error('摄像头被其他应用占用');
-      } else if (name === 'OverconstrainedError') {
-        throw new Error('摄像头分辨率不匹配');
-      } else if (name === 'AbortError') {
-        throw new Error('摄像头启动被中断');
+      var msg = err.message || '';
+      if (msg.indexOf('CAM:') === 0) {
+        throw new Error(msg.replace('CAM:', ''));
       }
       throw new Error('摄像头启动失败: ' + (err.message || '未知错误'));
     });
+  };
+
+  // 绘制摄像头帧到预览区（不包含骨骼）
+  StardustGesture.prototype._drawCameraFrame = function() {
+    var self = this;
+    var ctx = self._ctx;
+    if (!ctx) return;
+    var cw = CONFIG.previewWidth, ch = CONFIG.previewHeight;
+    if (self._videoEl && self._videoEl.readyState >= 2) {
+      ctx.drawImage(self._videoEl, 0, 0, cw, ch);
+    }
   };
 
   /* ================================================================
