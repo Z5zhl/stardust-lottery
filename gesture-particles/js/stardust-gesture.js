@@ -320,11 +320,11 @@
   };
 
   /* ================================================================
-   *  AI引擎加载（CDN优先 + 本地备用 + 超时 + 进度跟踪）
+   *  AI引擎加载（本地+CDN并行竞速 + 超时 + 进度跟踪）
    * ================================================================ */
-  // CDN地址（jsdelivr有正确的Content-Type和CORS，比GitHub Pages更可靠）
+  // CDN备用地址（本地优先，CDN作为备用源）
   var CDN_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18';
-  var AI_LOAD_TIMEOUT = 30000; // 30秒超时
+  var AI_LOAD_TIMEOUT = 15000; // 15秒超时（原30秒，国内CDN慢时避免长时间等待）
 
   StardustGesture.prototype._loadAIEngine = function() {
     var self = this;
@@ -337,21 +337,21 @@
     // 进度模拟
     var progress = 0;
     var progressTimer = setInterval(function() {
-      progress = Math.min(progress + 4, 88);
+      progress = Math.min(progress + 5, 90);
       self._gestureLabel.textContent = '下载AI引擎... ' + progress + '%';
-    }, 250);
+    }, 200);
 
     function stopProgress() { clearInterval(progressTimer); }
 
     // 超时Promise
     var timeoutPromise = new Promise(function(_, reject) {
       setTimeout(function() {
-        reject(new Error('TIMEOUT:AI引擎加载超时（30秒），请检查网络连接'));
+        reject(new Error('TIMEOUT:AI引擎加载超时（' + (AI_LOAD_TIMEOUT / 1000) + '秒），请检查网络连接'));
       }, AI_LOAD_TIMEOUT);
     });
 
-    // 加载vision_bundle模块（CDN优先，本地备用）
-    function loadModule(path) {
+    // 导入模块（仅import，不初始化）
+    function importModule(path) {
       return import(path).then(function(vision) {
         if (!vision.FilesetResolver || !vision.HandLandmarker) {
           var v = vision.default || vision;
@@ -361,23 +361,47 @@
             throw new Error('MODULE:vision_bundle模块结构异常，缺少HandLandmarker');
           }
         }
-        window.__sgVision = vision;
-        self._visionModule = vision;
-        stopProgress();
-        self._gestureLabel.textContent = '初始化手势识别...';
-        return self._initHandLandmarker();
+        return vision;
       });
     }
 
     var localVision = absUrl('vision_bundle.mjs');
     var cdnVision = CDN_BASE + '/vision_bundle.mjs';
 
+    // 并行竞速：本地 + CDN 同时发起，谁先成功用谁
+    var modulePromise = new Promise(function(resolve, reject) {
+      var settled = false;
+      var failedCount = 0;
+      var errors = [];
+
+      function onSuccess(vision, label) {
+        if (!settled) {
+          settled = true;
+          console.log('[StardustGesture] AI引擎加载成功(' + label + ')');
+          window.__sgVision = vision;
+          self._visionModule = vision;
+          resolve(vision);
+        }
+      }
+      function onFailure(err, label) {
+        errors.push(label + ': ' + (err.message || '未知错误'));
+        console.warn('[StardustGesture] ' + label + '加载失败:', err.message);
+        if (++failedCount >= 2 && !settled) {
+          reject(new Error('本地和CDN均加载失败：' + errors.join('; ')));
+        }
+      }
+
+      // 同时发起本地和CDN加载
+      importModule(localVision).then(function(v) { onSuccess(v, '本地'); }).catch(function(e) { onFailure(e, '本地'); });
+      importModule(cdnVision).then(function(v) { onSuccess(v, 'CDN'); }).catch(function(e) { onFailure(e, 'CDN'); });
+    });
+
     return Promise.race([
       timeoutPromise,
-      loadModule(cdnVision).catch(function(cdnErr) {
-        // CDN失败，尝试本地
-        console.warn('[StardustGesture] CDN加载失败，尝试本地:', cdnErr.message);
-        return loadModule(localVision);
+      modulePromise.then(function() {
+        stopProgress();
+        self._gestureLabel.textContent = '初始化手势识别...';
+        return self._initHandLandmarker();
       })
     ]).catch(function(err) {
       stopProgress();
@@ -390,7 +414,7 @@
         throw new Error(msg.replace('WASM:', ''));
       } else {
         console.error('[StardustGesture] AI引擎加载失败:', msg);
-        throw new Error('AI引擎加载失败，请刷新页面重试');
+        throw new Error('AI引擎加载失败，请重新点击✋按钮重试');
       }
     });
   };
@@ -400,10 +424,10 @@
     var vision = self._visionModule || window.__sgVision;
     var modelPath = absUrl('hand_landmarker.task');
 
-    // wasm源列表：CDN优先（有正确的Content-Type），本地备用
+    // wasm源列表：本地优先（同源加载快），CDN备用
     var wasmSources = [
-      CDN_BASE + '/wasm',           // CDN（Content-Type: application/wasm）
-      absUrl('wasm')                 // 本地（GitHub Pages可能Content-Type不对）
+      absUrl('wasm'),                 // 本地（同源，加载快）
+      CDN_BASE + '/wasm'              // CDN备用
     ];
 
     function tryDelegate(idx) {
@@ -417,7 +441,7 @@
           return tryDelegate(idx + 1);
         }
         var wasmBase = wasmSources[srcIdx];
-        var srcLabel = srcIdx === 0 ? 'CDN' : '本地';
+        var srcLabel = srcIdx === 0 ? '本地' : 'CDN';
         self._gestureLabel.textContent = '加载WASM(' + srcLabel + ')... ' + delegate;
         return vision.FilesetResolver.forVisionTasks(wasmBase).then(function(resolver) {
           return vision.HandLandmarker.createFromOptions(resolver, {
@@ -918,6 +942,24 @@
   StardustGesture.prototype.getHandPos = function() { return { x: this._handPos.x, y: this._handPos.y }; };
   StardustGesture.prototype.getGesture = function() { return this._stableGesture; };
   StardustGesture.prototype.getDispersion = function() { return this._dispersionAmount; };
+
+  /* ================================================================
+   *  预加载AI引擎（页面加载后静默预取，用户点击✋时直接命中缓存）
+   * ================================================================ */
+  if (typeof window !== 'undefined' && window.location && window.location.protocol !== 'file:') {
+    setTimeout(function() {
+      try {
+        import(absUrl('vision_bundle.mjs')).then(function(vision) {
+          if (!vision) return;
+          var v = vision.FilesetResolver ? vision : (vision.default && vision.default.FilesetResolver ? vision.default : null);
+          if (v && !window.__sgVision) {
+            window.__sgVision = v;
+            console.log('[StardustGesture] AI引擎预加载完成（用户点击时直接使用缓存）');
+          }
+        }).catch(function() { /* 预加载失败静默处理，正式加载时会重试 */ });
+      } catch(e) { /* 预加载失败静默处理 */ }
+    }, 2000); // 页面加载2秒后开始预取，避免与Three.js初始化争抢带宽
+  }
 
   global.StardustGesture = StardustGesture;
 })(window);
