@@ -1,100 +1,72 @@
 # ✦ 星尘抽奖 · Stardust Lottery
 
-> 一个基于 Three.js 的 3D 粒子抽奖系统，支持手势控制、22 个星座主题粒子球、稀有度差异化特效，纯静态部署。
+> 基于 Three.js 的 3D 粒子抽奖系统 — 手势控制、22 个星座主题粒子球、稀有度差异化特效、纯静态部署。
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.0-gold.svg)]()
+<p align="center">
+  <img src="https://img.shields.io/badge/version-v1.0-gold" alt="version">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="license">
+  <img src="https://img.shields.io/badge/部署-纯静态-green" alt="deploy">
+</p>
 
-## 功能特性
+## 快速开始
 
-- **3D 粒子球** — 22 个星座主题粒子球，3150 粒子/球，四层结构（能量核心 → 球壳 → 光晕 → 流光）
-- **手势控制** — 基于 MediaPipe 的单手手势识别，支持摄像头实时操控
-- **稀有度差异** — 传说/稀有/普通三级特效，金色粒子皇冠、光柱、冲击波等比缩放
-- **零配置奖品** — 文件名即规则，放入文件夹即可，无需修改代码
-- **图片奖品** — 支持 PNG/JPG/GIF/WEBP 图片奖品，3D 广告牌 + HTML 弹窗双展示
-- **限次奖品** — 文件名加 `_xN` 后缀自动限制抽中次数
-- **中奖记录** — 右上角滑出面板，显示稀有度标签、奖品名称和时间戳
-- **纯静态部署** — 无需后端服务器，通过 `prizes.json` 加载奖品数据
+```bash
+# 1. 克隆仓库
+git clone https://github.com/Z5zhl/stardust-lottery.git
+cd stardust-lottery
+
+# 2. 启动任意 HTTP 服务器（三选一）
+python -m http.server 9999          # Python 自带，无需安装
+npx serve . -p 9999                 # Node.js 一行命令
+# 或用 VS Code 装 Live Server 插件，右键 → Open with Live Server
+
+# 3. 浏览器打开
+# http://localhost:9999/gesture-particles/stardust-lottery.html
+```
+
+> ⚠️ **不能**直接用 `file://` 协议打开（浏览器安全策略限制），必须通过 HTTP 访问。
 
 ## 在线体验
 
 🌐 **[https://z5zhl.github.io/stardust-lottery/](https://z5zhl.github.io/stardust-lottery/)**
 
-## 本地运行
+## 操作方式
 
-### 方法一：通过 HTTP 服务器（推荐）
+| 方式 | 操作 | 功能 |
+|------|------|------|
+| 键盘 | `←` `→` | 切换粒子球（22 个星座主题） |
+| 键盘 | `空格` | 抽取奖品 |
+| 键盘 | `R` | 重置 |
+| 键盘 | `A` | 自动连续抽取 |
+| 鼠标 | 拖拽 | 360° 旋转视角 |
+| 手势 | 张开五指 | 粒子发散 |
+| 手势 | 握拳 | 爆炸抽取 |
+| 手势 | 食指单出 | 下一个粒子球 |
+| 手势 | 食指+中指 | 上一个粒子球 |
+| 手势 | 手部移动 | 旋转粒子球 |
 
-```bash
-# 启动本地服务器
-双击 启动服务器.bat
+> 手势控制需摄像头，点击页面右下角 ✋ 按钮开启。
 
-# 浏览器打开
-http://localhost:9999/gesture-particles/stardust-lottery.html
-```
+## 添加奖品
 
-> 注意：**不支持** `file://` 协议直接打开，奖品加载和手势识别需要通过 HTTP 访问。
-
-### 方法二：使用任意 HTTP 服务器
-
-```bash
-# Python
-python -m http.server 9999
-
-# Node.js (npx)
-npx serve . -p 9999
-
-# VS Code Live Server 插件
-右键 → Open with Live Server
-```
-
-## 操作指南
-
-### 键盘 & 鼠标
-
-| 操作 | 按键 |
-|------|------|
-| 下一个粒子球 | `→` 方向键 |
-| 上一个粒子球 | `←` 方向键 |
-| 抽取奖品 | `空格` |
-| 重置 | `R` |
-| 自动抽取 | `A` |
-| 旋转视角 | 鼠标拖拽 |
-
-### 手势控制（需摄像头）
-
-| 手势 | 功能 |
-|------|------|
-| 张开五指 | 粒子发散（程度可控） |
-| 握拳 | 爆炸抽取奖品 |
-| 食指单出 | 下一个粒子球 |
-| 食指+中指 | 上一个粒子球 |
-| 手部移动 | 360° 旋转粒子球 |
-
-点击右下角 ✋ 按钮开启手势控制面板。
-
-## 奖品配置
-
-### 核心规则：文件名即一切
+**规则：文件名即配置，零代码修改。**
 
 ```
-奖品文件命名格式：权重.奖品名.扩展名
-
-  3.鸿运当头.txt    →  权重=3（传说级），文字奖品
-  5.星辰大海.png    →  权重=5（稀有级），图片奖品
-  8.心想事成_x2.txt →  权重=8（普通级），最多抽中 2 次
+gesture-particles/prizes/
+  ├── 3.神秘大礼.png        → 权重=3（传说级），图片奖品
+  ├── 5.星辰大海.png        → 权重=5（稀有级），图片奖品
+  ├── 8.心想事成_x2.txt     → 权重=8（普通级），最多抽中 2 次
+  └── ...
 ```
 
-### 权重 → 稀有度
+| 权重 | 稀有度 | 特效 |
+|------|--------|------|
+| 1 ~ 4 | ⭐ 传说 | 金色粒子皇冠、14 道光柱、5 层冲击波、12 秒展示 |
+| 5 ~ 7 | ✦ 稀有 | 蓝色粒子皇冠、6 道光柱、3 层冲击波、8 秒展示 |
+| 8+ | · 普通 | 灰色粒子、1 层冲击波、6 秒展示 |
 
-| 权重 | 稀有度 | 颜色 | 特效 |
-|------|--------|------|------|
-| 1 ~ 4 | 传说 ★ | 金色 | 5 层冲击波、14 道光柱、粒子皇冠、12 秒展示 |
-| 5 ~ 7 | 稀有 ✦ | 蓝色 | 3 层冲击波、6 道光柱、粒子皇冠、8 秒展示 |
-| 8+ | 普通 · | 灰色 | 1 层冲击波、无光柱、6 秒展示 |
-
-### 添加新奖品
-
-1. 在 `gesture-particles/prizes/` 文件夹放置文件
+**完整流程：**
+1. 按格式命名文件放入 `gesture-particles/prizes/`
 2. 在 `gesture-particles/prizes.json` 中添加对应条目
 3. 刷新页面生效
 
@@ -102,38 +74,52 @@ npx serve . -p 9999
 
 ```
 stardust-lottery/
-├── index.html                          # 入口页
+├── index.html                          # 🏠 入口页
 ├── gesture-particles/
-│   ├── stardust-lottery.html           # 抽奖主页面
-│   ├── prizes.json                     # 奖品数据配置
-│   ├── prizes/                         # 奖品文件（12个）
-│   │   ├── 3.神秘大礼.png              # 传说级图片奖品
-│   │   ├── 3.财源广进.txt              # 传说级文字奖品
-│   │   └── ...                         # 更多奖品
+│   ├── stardust-lottery.html           # 🎯 抽奖主页面
+│   ├── prizes.json                     # 📋 奖品数据（12 个预设）
+│   ├── prizes/                         # 🎁 奖品文件（图片/文字）
 │   └── js/
-│       ├── gesture-controller.js       # MediaPipe 手势识别引擎
-│       └── stardust-gesture.js         # 手势控制系统
-└── libs/
-    ├── threejs-r128/                   # Three.js 3D 渲染库
-    └── mediapipe/                      # AI 手势识别模型
+│       ├── gesture-controller.js       # 🖐 手势识别底层引擎
+│       └── stardust-gesture.js         # 🎮 手势控制系统
+└── libs/                               # ⚠️ 见下方依赖说明
+    ├── threejs-r128/                   # 🔄 可替代
+    └── mediapipe/                      # ⚠️ 部分可替代
 ```
+
+## 依赖说明
+
+### 核心依赖（必需）
+
+| 库 | 用途 | 加载方式 |
+|----|------|----------|
+| Three.js 0.160 | 3D 粒子渲染 | CDN 自动加载（`unpkg.com`） |
+| MediaPipe Vision | 手势关键点识别 | 本地 `libs/mediapipe/` |
+
+### 本地库文件说明
+
+| 路径 | 说明 | 可替代？ |
+|------|------|----------|
+| `libs/threejs-r128/` | Three.js 及扩展（18 个文件） | ✅ **可删除** — HTML 已从 CDN 加载 Three.js，这些文件仅用于本地离线开发 |
+| `libs/mediapipe/vision_bundle.mjs` | AI 手势识别核心 | ❌ 必需 |
+| `libs/mediapipe/hand_landmarker.task` | 手部关键点模型 | ❌ 必需 |
+| `libs/mediapipe/wasm/` | WebAssembly 运行时（4 个文件） | ❌ 必需 |
+| `libs/mediapipe/vision_bundle.js` | 同 `.mjs` 的 CJS 版本 | ✅ 可删除（`.mjs` 已足够） |
+| `libs/mediapipe/camera_utils.js` | 旧版 MediaPipe 工具 | ✅ 可删除（未被引用） |
+| `libs/mediapipe/drawing_utils.js` | 旧版 MediaPipe 绘图 | ✅ 可删除（未被引用） |
+| `libs/mediapipe/hands.js` | 旧版 MediaPipe Hands | ✅ 可删除（已被 Vision 替代） |
+| `libs/mediapipe/face_mesh.js` | 面部识别 | ✅ 可删除（未被使用） |
+| `libs/mediapipe/pose.js` | 姿态识别 | ✅ 可删除（未被使用） |
+| `libs/mediapipe/holistic.js` | 全身识别 | ✅ 可删除（未被使用） |
+
+> **精简建议**：如果你只用 GitHub Pages 部署，可以删除整个 `libs/threejs-r128/` 目录（约 2.8MB），Three.js 会从 CDN 自动加载。MediaPipe 只保留 `vision_bundle.mjs`、`hand_landmarker.task`、`wasm/` 三个即可。
 
 ## 技术栈
 
-- **Three.js 0.160** — 3D 渲染引擎（CDN 加载）
-- **MediaPipe Tasks Vision** — 手势关键点识别（GPU 加速）
-- **WebGL** — 粒子着色器特效
-- **纯静态 HTML/CSS/JS** — 零依赖部署
-
-## 开发
-
-```bash
-# 启动本地开发服务器
-node server.js
-
-# 或双击
-启动服务器.bat
-```
+- **Three.js 0.160** — 3D 渲染（CDN）
+- **MediaPipe Tasks Vision** — AI 手势识别（GPU 加速）
+- **WebGL** — 粒子着色器
+- **纯静态 HTML/CSS/JS** — 零后端依赖
 
 ## License
 
