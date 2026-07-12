@@ -324,7 +324,7 @@ const CONSTELLATIONS = [
   {id:21,name:'天鹤座',en:'GRUS',symbol:'✶',color:'#a0c0a0',hex:0xa0c0a0}
 ];
 
-// ==================== V39: 奖品文件夹零配置 ====================
+// ==================== 奖品文件夹零配置 ====================
 // 只需在 gesture-particles/prizes/ 文件夹中放入任意文件即可：
 //   任意 .txt 文件 → 文字奖品（第一行是描述，全部内容可显示）
 //   任意 .png .jpg .gif .webp 等图片 → 图片奖品（动图也支持）
@@ -343,7 +343,7 @@ fetch('prizes.json').then(r => r.json()).then(data => {
     PRIZE_WEIGHTS = data.weights || PRIZE_WEIGHTS;
     console.log('✦ V1: 加载 ' + PRIZES.length + ' 个奖品（静态 JSON）');
     PRIZES.forEach(p => console.log('  ' + (p.rarity === 'legendary' ? '★' : p.rarity === 'rare' ? '✦' : '·') + ' ' + p.name + ' [w=' + (p.weight||1) + ']' + (p.quantity > 0 ? ' 限' + p.quantity + '次' : '') + (p.type === 'image' ? ' (图片)' : '')));
-    // V39: 预加载图片奖品
+    // 预加载图片奖品
     preloadPrizeImages();
   }
   buildWeightedPool();
@@ -364,7 +364,7 @@ function buildWeightedPool() {
 }
 buildWeightedPool();
 
-// V39: 图片奖品预加载 & 图片展示画布
+// 图片奖品预加载 & 图片展示画布
 const prizeImageCache = new Map(); // url -> Image element
 const prizeImageCanvas = document.createElement('canvas');
 prizeImageCanvas.width = 1024; prizeImageCanvas.height = 512;
@@ -382,7 +382,7 @@ function preloadPrizeImages() {
   }
 }
 
-// V39: 数字雨背景系统（科幻矩阵风格）
+// 数字雨背景系统（科幻矩阵风格）
 const digitalRainChars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789><÷×∆∑∏√∞∫≈≠≡≤≥';
 const digitalRainCols = 60; // 列数
 const digitalRainData = [];
@@ -1937,7 +1937,7 @@ function activateFountain(prize){
   prizeFountain.material.opacity=isLegendary?0.7:0.5;
 }
 
-// V39: 公告板扫描线+故障动画（每次 PRIZE_SHOWN 帧调用）
+// 公告板扫描线+故障动画（每次 PRIZE_SHOWN 帧调用）
 function updateBillboardScanlines(totalTime) {
   if (!prizeBillboardCanvas || !prizeBillboardTex) return;
   const ctx = prizeBillboardCanvas.getContext('2d');
@@ -1964,7 +1964,7 @@ function updateBillboardScanlines(totalTime) {
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(0, scanY2); ctx.lineTo(w, scanY2); ctx.stroke();
 
-  // V39: 传说级故障效果 —— 偶尔的横向偏移条纹
+  // 传说级故障效果 —— 偶尔的横向偏移条纹
   if (isLegendary && Math.sin(totalTime * 7.3) > 0.92) {
     const glitchY = 100 + Math.floor(Math.random() * 300);
     const glitchH = 8 + Math.floor(Math.random() * 20);
@@ -2039,7 +2039,7 @@ function updateBillboardScanlines(totalTime) {
   }
 })();
 
-// ==================== V39: 科幻全息公告板 · 数字雨+故障效果+图片展示 ====================
+// ==================== 科幻全息公告板 · 数字雨+故障效果+图片展示 ====================
 function renderPrizeBillboard(prize) {
   if (!prizeBillboardCanvas || !prizeBillboardTex) return;
   const c = prizeBillboardCanvas, w = 1024, h = 512;
