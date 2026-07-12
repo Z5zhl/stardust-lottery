@@ -304,59 +304,127 @@
   };
 
   /* ================================================================
-   *  AI引擎加载
+   *  AI引擎加载（CDN优先 + 本地备用 + 超时 + 进度跟踪）
    * ================================================================ */
+  // CDN地址（jsdelivr有正确的Content-Type和CORS，比GitHub Pages更可靠）
+  var CDN_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18';
+  var AI_LOAD_TIMEOUT = 30000; // 30秒超时
+
   StardustGesture.prototype._loadAIEngine = function() {
     var self = this;
     if (window.__sgVision && window.__sgVision.HandLandmarker) {
       self._visionModule = window.__sgVision;
+      self._gestureLabel.textContent = '初始化手势识别...';
       return self._initHandLandmarker();
     }
-    var visionPath = absUrl('vision_bundle.mjs');
-    return import(visionPath).then(function(vision) {
-      window.__sgVision = vision;
-      self._visionModule = vision;
-      if (!vision.FilesetResolver || !vision.HandLandmarker) {
-        var v = vision.default || vision;
-        if (v && v.FilesetResolver && v.HandLandmarker) {
-          window.__sgVision = v;
-          self._visionModule = v;
-        } else {
-          throw new Error('vision_bundle 缺少 HandLandmarker');
+
+    // 进度模拟
+    var progress = 0;
+    var progressTimer = setInterval(function() {
+      progress = Math.min(progress + 4, 88);
+      self._gestureLabel.textContent = '下载AI引擎... ' + progress + '%';
+    }, 250);
+
+    function stopProgress() { clearInterval(progressTimer); }
+
+    // 超时Promise
+    var timeoutPromise = new Promise(function(_, reject) {
+      setTimeout(function() {
+        reject(new Error('TIMEOUT:AI引擎加载超时（30秒），请检查网络连接'));
+      }, AI_LOAD_TIMEOUT);
+    });
+
+    // 加载vision_bundle模块（CDN优先，本地备用）
+    function loadModule(path) {
+      return import(path).then(function(vision) {
+        if (!vision.FilesetResolver || !vision.HandLandmarker) {
+          var v = vision.default || vision;
+          if (v && v.FilesetResolver && v.HandLandmarker) {
+            vision = v;
+          } else {
+            throw new Error('MODULE:vision_bundle模块结构异常，缺少HandLandmarker');
+          }
         }
+        window.__sgVision = vision;
+        self._visionModule = vision;
+        stopProgress();
+        self._gestureLabel.textContent = '初始化手势识别...';
+        return self._initHandLandmarker();
+      });
+    }
+
+    var localVision = absUrl('vision_bundle.mjs');
+    var cdnVision = CDN_BASE + '/vision_bundle.mjs';
+
+    return Promise.race([
+      timeoutPromise,
+      loadModule(cdnVision).catch(function(cdnErr) {
+        // CDN失败，尝试本地
+        console.warn('[StardustGesture] CDN加载失败，尝试本地:', cdnErr.message);
+        return loadModule(localVision);
+      })
+    ]).catch(function(err) {
+      stopProgress();
+      var msg = err.message || '';
+      if (msg.indexOf('TIMEOUT:') === 0) {
+        throw new Error(msg.replace('TIMEOUT:', ''));
+      } else if (msg.indexOf('MODULE:') === 0) {
+        throw new Error(msg.replace('MODULE:', ''));
+      } else if (msg.indexOf('WASM:') === 0) {
+        throw new Error(msg.replace('WASM:', ''));
+      } else {
+        console.error('[StardustGesture] AI引擎加载失败:', msg);
+        throw new Error('AI引擎加载失败，请刷新页面重试');
       }
-      return self._initHandLandmarker();
-    }).catch(function(err) {
-      console.error('[StardustGesture] AI引擎加载失败:', err.message);
-      throw new Error('AI引擎加载失败');
     });
   };
 
   StardustGesture.prototype._initHandLandmarker = function() {
     var self = this;
     var vision = self._visionModule || window.__sgVision;
-    var wasmBase = absUrl('wasm');
     var modelPath = absUrl('hand_landmarker.task');
+
+    // wasm源列表：CDN优先（有正确的Content-Type），本地备用
+    var wasmSources = [
+      CDN_BASE + '/wasm',           // CDN（Content-Type: application/wasm）
+      absUrl('wasm')                 // 本地（GitHub Pages可能Content-Type不对）
+    ];
 
     function tryDelegate(idx) {
       var delegates = ['GPU', 'CPU'];
-      if (idx >= delegates.length) throw new Error('所有 delegate 初始化失败');
+      if (idx >= delegates.length) throw new Error('WASM:所有delegate初始化失败，浏览器可能不支持WebGL');
       var delegate = delegates[idx];
-      return vision.FilesetResolver.forVisionTasks(wasmBase).then(function(resolver) {
-        return vision.HandLandmarker.createFromOptions(resolver, {
-          baseOptions: { modelAssetPath: modelPath, delegate: delegate },
-          numHands: 1,
-          minHandDetectionConfidence: 0.5,
-          minHandPresenceConfidence: 0.5,
-          minTrackingConfidence: 0.5,
-          runningMode: 'VIDEO'
+
+      function tryWasmSource(srcIdx) {
+        if (srcIdx >= wasmSources.length) {
+          // 所有wasm源都失败，继续尝试下一个delegate
+          return tryDelegate(idx + 1);
+        }
+        var wasmBase = wasmSources[srcIdx];
+        var srcLabel = srcIdx === 0 ? 'CDN' : '本地';
+        self._gestureLabel.textContent = '加载WASM(' + srcLabel + ')... ' + delegate;
+        return vision.FilesetResolver.forVisionTasks(wasmBase).then(function(resolver) {
+          return vision.HandLandmarker.createFromOptions(resolver, {
+            baseOptions: { modelAssetPath: modelPath, delegate: delegate },
+            numHands: 1,
+            minHandDetectionConfidence: 0.5,
+            minHandPresenceConfidence: 0.5,
+            minTrackingConfidence: 0.5,
+            runningMode: 'VIDEO'
+          });
+        }).then(function(hl) {
+          self._handLandmarker = hl;
+          self._gestureLabel.textContent = 'AI引擎就绪';
+        }).catch(function(err) {
+          console.warn('[StardustGesture] WASM加载失败(' + srcLabel + '/' + delegate + '):', err.message);
+          // 当前源失败，尝试下一个源
+          return tryWasmSource(srcIdx + 1);
         });
-      }).then(function(hl) {
-        self._handLandmarker = hl;
-      }).catch(function() {
-        return tryDelegate(idx + 1);
-      });
+      }
+
+      return tryWasmSource(0);
     }
+
     return tryDelegate(0);
   };
 
