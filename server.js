@@ -71,7 +71,7 @@ function getMimeType(filePath) {
  * 确保解析后的绝对路径在 ROOT_DIR 范围内
  */
 function isSafePath(requestedPath) {
-    var resolved = path.resolve(ROOT_DIR, requestedPath);
+    var resolved = path.join(ROOT_DIR, requestedPath);
     var normalized = path.normalize(resolved);
     return normalized.indexOf(ROOT_DIR) === 0;
 }
@@ -103,7 +103,7 @@ function serveStaticFile(req, res) {
     }
 
     var parsedUrl = url.parse(req.url);
-    var pathname = parsedUrl.pathname === '/' ? '/index.html' : parsedUrl.pathname;
+    var pathname = parsedUrl.pathname === '/' ? '/index.html' : decodeURIComponent(parsedUrl.pathname);
 
     // 安全检查
     if (!isSafePath(pathname)) {

@@ -143,6 +143,10 @@
   StardustGesture.prototype._createUI = function() {
     var self = this;
 
+    // 防止重复创建：移除已存在的旧面板
+    var existing = document.getElementById('sg-root');
+    if (existing) existing.remove();
+
     // 主容器
     this._uiRoot = document.createElement('div');
     this._uiRoot.id = 'sg-root';
@@ -285,7 +289,10 @@
       this._videoEl.srcObject = null;
     }
     this._handLandmarker = null;
-    this._uiRoot.style.display = 'none';
+    if (this._uiRoot) {
+      this._uiRoot.remove();
+      this._uiRoot = null;
+    }
 
     // 重置状态
     if (this._onRotate) this._onRotate(0, 0);
@@ -326,7 +333,7 @@
   StardustGesture.prototype._initHandLandmarker = function() {
     var self = this;
     var vision = self._visionModule || window.__sgVision;
-    var wasmBase = absUrl('wasm/');
+    var wasmBase = absUrl('wasm');
     var modelPath = absUrl('hand_landmarker.task');
 
     function tryDelegate(idx) {

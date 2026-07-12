@@ -2744,6 +2744,15 @@ function toggleGesture() {
 
 async function startGesture() {
   const btn = el('btn-gesture');
+  // 防止重复点击：先清理旧实例
+  if (stardustGesture) {
+    stardustGesture.stop();
+    stardustGesture = null;
+  }
+  // 移除残留的旧面板（兜底）
+  var oldPanel = document.getElementById('sg-root');
+  if (oldPanel) oldPanel.remove();
+  
   btn.classList.add('active');
   btn.textContent = '⏳';
   try {
@@ -2800,6 +2809,9 @@ function stopGesture() {
     stardustGesture.stop();
     stardustGesture = null;
   }
+  // 移除面板 DOM（兜底）
+  var panel = document.getElementById('sg-root');
+  if (panel) panel.remove();
   const btn = el('btn-gesture');
   btn.classList.remove('active');
   btn.textContent = '✋';
