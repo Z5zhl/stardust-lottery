@@ -262,8 +262,10 @@
     self._gestureLabel.textContent = '启动摄像头...';
     self._initState = 'loading';
 
-    return self._loadAIEngine().then(function() {
-      return self._startCamera();
+    // 【关键修复】先请求摄像头（必须在用户点击后同步调用 getUserMedia，浏览器安全策略）
+    return self._startCamera().then(function() {
+      self._gestureLabel.textContent = '加载AI引擎...';
+      return self._loadAIEngine();
     }).then(function() {
       self._active = true;
       self._initState = 'ready';
@@ -363,9 +365,27 @@
    * ================================================================ */
   StardustGesture.prototype._startCamera = function() {
     var self = this;
-    return navigator.mediaDevices.getUserMedia({
-      video: { width: 640, height: 480, facingMode: 'user' }
-    }).then(function(stream) {
+
+    // 检查浏览器是否支持摄像头
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      return Promise.reject(new Error('浏览器不支持摄像头（需HTTPS或localhost）'));
+    }
+
+    // 15秒超时：防止权限弹窗被忽略时无限等待
+    var timeoutId;
+    var timeoutPromise = new Promise(function(_, reject) {
+      timeoutId = setTimeout(function() {
+        reject(new Error('摄像头启动超时，请检查权限弹窗'));
+      }, 15000);
+    });
+
+    return Promise.race([
+      timeoutPromise,
+      navigator.mediaDevices.getUserMedia({
+        video: { width: 640, height: 480, facingMode: 'user' }
+      })
+    ]).then(function(stream) {
+      clearTimeout(timeoutId);
       self._stream = stream;
       self._videoEl = document.createElement('video');
       self._videoEl.setAttribute('playsinline', '');
@@ -375,6 +395,21 @@
       return self._videoEl.play();
     }).then(function() {
       self._ctx = self._canvasEl.getContext('2d');
+    }).catch(function(err) {
+      // 友好的中文错误提示
+      var name = err.name || '';
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        throw new Error('摄像头权限被拒绝，请在浏览器设置中允许');
+      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+        throw new Error('未检测到摄像头设备');
+      } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+        throw new Error('摄像头被其他应用占用');
+      } else if (name === 'OverconstrainedError') {
+        throw new Error('摄像头分辨率不匹配');
+      } else if (name === 'AbortError') {
+        throw new Error('摄像头启动被中断');
+      }
+      throw new Error('摄像头启动失败: ' + (err.message || '未知错误'));
     });
   };
 
