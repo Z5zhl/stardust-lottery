@@ -3,6 +3,16 @@ server.js
 启动服务器.bat
 使用说明.txt
 
+# 本地库文件（CDN 可替代，仅本地开发需要）
+libs/threejs-r128/
+libs/mediapipe/camera_utils.js
+libs/mediapipe/drawing_utils.js
+libs/mediapipe/face_mesh.js
+libs/mediapipe/hands.js
+libs/mediapipe/holistic.js
+libs/mediapipe/pose.js
+libs/mediapipe/vision_bundle.js
+
 # 临时文件
 *.tmp
 *.log
