@@ -334,14 +334,14 @@ let PRIZES = [];
 let PRIZE_WEIGHTS = { legendary: 1, rare: 3, common: 6 };
 let weightedPool = [];
 
-// V48: 从静态 prizes.json 加载奖品数据（无需服务器API）
+// V1: 从静态 prizes.json 加载奖品数据（无需服务器API）
 fetch('prizes.json').then(r => r.json()).then(data => {
   if (data && data.success && data.prizes && data.prizes.length > 0) {
-    // V48: 用 mutate 方式更新，保持引用一致
+    // V1: 用 mutate 方式更新，保持引用一致
     PRIZES.length = 0;
     PRIZES.push(...data.prizes);
     PRIZE_WEIGHTS = data.weights || PRIZE_WEIGHTS;
-    console.log('✦ V48: 加载 ' + PRIZES.length + ' 个奖品（静态 JSON）');
+    console.log('✦ V1: 加载 ' + PRIZES.length + ' 个奖品（静态 JSON）');
     PRIZES.forEach(p => console.log('  ' + (p.rarity === 'legendary' ? '★' : p.rarity === 'rare' ? '✦' : '·') + ' ' + p.name + ' [w=' + (p.weight||1) + ']' + (p.quantity > 0 ? ' 限' + p.quantity + '次' : '') + (p.type === 'image' ? ' (图片)' : '')));
     // V39: 预加载图片奖品
     preloadPrizeImages();
@@ -356,7 +356,7 @@ fetch('prizes.json').then(r => r.json()).then(data => {
 function buildWeightedPool() {
   weightedPool = [];
   for (const p of PRIZES) {
-    // V46: 跳过已抽完的奖品（quantity>0 且 remaining<=0）
+    // 跳过已抽完的奖品（quantity>0 且 remaining<=0）
     if (p.quantity > 0 && p.remaining <= 0) continue;
     const w = p.weight || 1;
     for (let i = 0; i < w; i++) weightedPool.push(p);
@@ -2368,12 +2368,12 @@ function updateShardAnimation(dt){
 
 function startDraw(){
   if(state!==State.IDLE||switchPhase!=='idle')return;
-  // V46: 重建加权池（排除已抽完的奖品）
+  // 重建加权池（排除已抽完的奖品）
   buildWeightedPool();
   const pool=weightedPool.length>0?weightedPool:PRIZES;
   if(pool.length===0){showToast('奖品已全部抽完，重置后可继续');return;}
   selectedPrize=pool[randInt(0,pool.length-1)];
-  // V46: 扣除可抽次数
+  // 扣除可抽次数
   if(selectedPrize.quantity>0){
     selectedPrize.remaining--;
     if(selectedPrize.remaining<=0){
@@ -3570,7 +3570,7 @@ function init(){
 init();
 
 window.__stardust={scene,camera,getState:()=>state,getCardIdx:()=>currentCardIdx,getSwitchPhase:()=>switchPhase,startDraw,resetAll,switchConstellation,CONSTELLATIONS,PRIZES,prizeBillboard,drawHistory,getGesture:()=>stardustGesture,spawnHeartParticles};
-console.log('✦ STARDUST LOTTERY V48 · 静态部署+手势控制 · 单手操控');
+console.log('✦ STARDUST LOTTERY V1 · 手势控制+3D粒子球 · 静态部署');
   console.log('  改概率: 改文件名开头数字 → 3.鸿运当头.txt（大=易中, 小=稀有）');
   console.log('  限次数: 文件名结尾加 _xN → 3.鸿运当头_x2.txt（最多抽中2次）');
   console.log('  ✋ 手势: 抓取旋转 | ☝食指=下一个 | ✌食指+中指=上一个 | 🖐五指=发散 | ✊握拳=爆炸 | ❤比心=爱心');
