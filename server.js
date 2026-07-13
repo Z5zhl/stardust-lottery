@@ -11,30 +11,47 @@ var HOST = 'localhost';
 // 静态文件服务根目录
 var ROOT_DIR = __dirname;
 
-// 需要下载的 MediaPipe 文件列表
+// 需要下载的 MediaPipe 文件列表（国内镜像优先，jsdelivr备用）
 var DOWNLOAD_FILES = [
     {
-        url: 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/vision_bundle.mjs',
+        urls: [
+            'https://registry.npmmirror.com/@mediapipe/tasks-vision/0.10.18/files/vision_bundle.mjs',
+            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/vision_bundle.mjs'
+        ],
         local: 'libs/mediapipe/vision_bundle.mjs'
     },
     {
-        url: 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm/vision_wasm_internal.js',
+        urls: [
+            'https://registry.npmmirror.com/@mediapipe/tasks-vision/0.10.18/files/wasm/vision_wasm_internal.js',
+            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm/vision_wasm_internal.js'
+        ],
         local: 'libs/mediapipe/wasm/vision_wasm_internal.js'
     },
     {
-        url: 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm/vision_wasm_internal.wasm',
+        urls: [
+            'https://registry.npmmirror.com/@mediapipe/tasks-vision/0.10.18/files/wasm/vision_wasm_internal.wasm',
+            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm/vision_wasm_internal.wasm'
+        ],
         local: 'libs/mediapipe/wasm/vision_wasm_internal.wasm'
     },
     {
-        url: 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm/vision_wasm_nosimd_internal.js',
+        urls: [
+            'https://registry.npmmirror.com/@mediapipe/tasks-vision/0.10.18/files/wasm/vision_wasm_nosimd_internal.js',
+            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm/vision_wasm_nosimd_internal.js'
+        ],
         local: 'libs/mediapipe/wasm/vision_wasm_nosimd_internal.js'
     },
     {
-        url: 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm/vision_wasm_nosimd_internal.wasm',
+        urls: [
+            'https://registry.npmmirror.com/@mediapipe/tasks-vision/0.10.18/files/wasm/vision_wasm_nosimd_internal.wasm',
+            'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm/vision_wasm_nosimd_internal.wasm'
+        ],
         local: 'libs/mediapipe/wasm/vision_wasm_nosimd_internal.wasm'
     },
     {
-        url: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+        urls: [
+            'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task'
+        ],
         local: 'libs/mediapipe/hand_landmarker.task'
     }
 ];
@@ -145,11 +162,11 @@ function serveStaticFile(req, res) {
 }
 
 /**
- * 下载单个文件（支持 HTTP 重定向）
+ * 下载单个文件（支持多源回退 + HTTP 重定向）
  */
 function downloadFile(fileInfo, callback) {
     var localPath = fileInfo.local;
-    var fileUrl = fileInfo.url;
+    var urls = fileInfo.urls || (fileInfo.url ? [fileInfo.url] : []);
     var tmpPath = localPath + '.tmp';
 
     // 确保本地目录存在
@@ -168,37 +185,50 @@ function downloadFile(fileInfo, callback) {
         }
     }
 
-    console.log('[下载] 开始: ' + fileUrl);
-    console.log('[下载] 保存到: ' + localPath);
-
-    // 发起下载请求（自动处理重定向）
-    doDownload(fileUrl, tmpPath, 0, function (err) {
-        if (err) {
-            console.error('[错误] 下载失败: ' + fileUrl + ' - ' + err.message);
-            // 清理临时文件
+    // 依次尝试多个URL，直到成功
+    function tryUrl(idx) {
+        if (idx >= urls.length) {
+            console.error('[错误] 所有源均下载失败: ' + localPath);
             if (fs.existsSync(tmpPath)) {
                 fs.unlinkSync(tmpPath);
             }
-            callback(err);
+            callback(new Error('所有源均下载失败'));
             return;
         }
+        var fileUrl = urls[idx];
+        console.log('[下载] 开始(' + (idx + 1) + '/' + urls.length + '): ' + fileUrl);
+        console.log('[下载] 保存到: ' + localPath);
 
-        // 原子操作：重命名临时文件
-        try {
-            if (fs.existsSync(localPath)) {
-                fs.unlinkSync(localPath);
+        doDownload(fileUrl, tmpPath, 0, function (err) {
+            if (err) {
+                console.warn('[警告] 源' + (idx + 1) + '下载失败: ' + fileUrl + ' - ' + err.message);
+                // 清理临时文件，尝试下一个源
+                if (fs.existsSync(tmpPath)) {
+                    fs.unlinkSync(tmpPath);
+                }
+                tryUrl(idx + 1);
+                return;
             }
-            fs.renameSync(tmpPath, localPath);
-            var finalStats = fs.statSync(localPath);
-            console.log('[完成] ' + localPath + ' (' + finalStats.size + ' 字节)');
-        } catch (e) {
-            console.error('[错误] 重命名失败: ' + e.message);
-            callback(e);
-            return;
-        }
 
-        callback(null);
-    });
+            // 原子操作：重命名临时文件
+            try {
+                if (fs.existsSync(localPath)) {
+                    fs.unlinkSync(localPath);
+                }
+                fs.renameSync(tmpPath, localPath);
+                var finalStats = fs.statSync(localPath);
+                console.log('[完成] ' + localPath + ' (' + finalStats.size + ' 字节)');
+            } catch (e) {
+                console.error('[错误] 重命名失败: ' + e.message);
+                callback(e);
+                return;
+            }
+
+            callback(null);
+        });
+    }
+
+    tryUrl(0);
 }
 
 /**

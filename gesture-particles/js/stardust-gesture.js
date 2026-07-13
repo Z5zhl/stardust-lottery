@@ -320,11 +320,17 @@
   };
 
   /* ================================================================
-   *  AI引擎加载（本地+CDN并行竞速 + 超时 + 进度跟踪）
+   *  AI引擎加载（本地+多CDN并行竞速 + 超时 + 进度跟踪）
    * ================================================================ */
-  // CDN备用地址（本地优先，CDN作为备用源）
-  var CDN_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18';
-  var AI_LOAD_TIMEOUT = 15000; // 15秒超时（原30秒，国内CDN慢时避免长时间等待）
+  // CDN源列表（国内镜像优先，提高国内可用性）
+  var CDN_SOURCES = [
+    'https://registry.npmmirror.com/@mediapipe/tasks-vision/0.10.18/files',
+    'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18',
+    'https://unpkg.com/@mediapipe/tasks-vision@0.10.18'
+  ];
+  // 模型文件CDN地址（本地失败时备用）
+  var CDN_MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+  var AI_LOAD_TIMEOUT = 30000; // 30秒超时（留足时间尝试多个CDN源）
 
   StardustGesture.prototype._loadAIEngine = function() {
     var self = this;
@@ -366,11 +372,11 @@
     }
 
     var localVision = absUrl('vision_bundle.mjs');
-    var cdnVision = CDN_BASE + '/vision_bundle.mjs';
 
-    // 并行竞速：本地 + CDN 同时发起，谁先成功用谁
+    // 并行竞速：本地 + 多个CDN 同时发起，谁先成功用谁
     var modulePromise = new Promise(function(resolve, reject) {
       var settled = false;
+      var totalCount = 1 + CDN_SOURCES.length;
       var failedCount = 0;
       var errors = [];
 
@@ -386,14 +392,18 @@
       function onFailure(err, label) {
         errors.push(label + ': ' + (err.message || '未知错误'));
         console.warn('[StardustGesture] ' + label + '加载失败:', err.message);
-        if (++failedCount >= 2 && !settled) {
-          reject(new Error('本地和CDN均加载失败：' + errors.join('; ')));
+        if (++failedCount >= totalCount && !settled) {
+          reject(new Error('本地和所有CDN均加载失败：' + errors.join('; ')));
         }
       }
 
-      // 同时发起本地和CDN加载
+      // 本地优先
       importModule(localVision).then(function(v) { onSuccess(v, '本地'); }).catch(function(e) { onFailure(e, '本地'); });
-      importModule(cdnVision).then(function(v) { onSuccess(v, 'CDN'); }).catch(function(e) { onFailure(e, 'CDN'); });
+      // 多个CDN并行
+      CDN_SOURCES.forEach(function(cdn, i) {
+        var label = 'CDN' + (i + 1) + '(' + (i === 0 ? '国内' : i === 1 ? 'jsdelivr' : 'unpkg') + ')';
+        importModule(cdn + '/vision_bundle.mjs').then(function(v) { onSuccess(v, label); }).catch(function(e) { onFailure(e, label); });
+      });
     });
 
     return Promise.race([
@@ -422,50 +432,85 @@
   StardustGesture.prototype._initHandLandmarker = function() {
     var self = this;
     var vision = self._visionModule || window.__sgVision;
-    var modelPath = absUrl('hand_landmarker.task');
 
-    // wasm源列表：本地优先（同源加载快），CDN备用
-    var wasmSources = [
-      absUrl('wasm'),                 // 本地（同源，加载快）
-      CDN_BASE + '/wasm'              // CDN备用
+    // 模型文件源：本地优先，Google CDN备用
+    var modelPaths = [
+      { url: absUrl('hand_landmarker.task'), label: '本地' },
+      { url: CDN_MODEL_URL, label: 'CDN' }
     ];
 
-    function tryDelegate(idx) {
-      var delegates = ['GPU', 'CPU'];
-      if (idx >= delegates.length) throw new Error('WASM:所有delegate初始化失败，浏览器可能不支持WebGL');
-      var delegate = delegates[idx];
+    // WASM源：本地优先，国内镜像次之，海外CDN最后
+    var wasmSources = [
+      { url: absUrl('wasm'), label: '本地' },
+      { url: CDN_SOURCES[0] + '/wasm', label: '国内CDN' },
+      { url: CDN_SOURCES[1] + '/wasm', label: 'jsdelivr' },
+      { url: CDN_SOURCES[2] + '/wasm', label: 'unpkg' }
+    ];
 
-      function tryWasmSource(srcIdx) {
-        if (srcIdx >= wasmSources.length) {
-          // 所有wasm源都失败，继续尝试下一个delegate
-          return tryDelegate(idx + 1);
+    var allErrors = [];
+    var PER_SOURCE_TIMEOUT = 10000; // 每个源10秒超时
+
+    function withTimeout(promise, ms) {
+      return Promise.race([
+        promise,
+        new Promise(function(_, reject) {
+          setTimeout(function() { reject(new Error('超时' + (ms / 1000) + 's')); }, ms);
+        })
+      ]);
+    }
+
+    // 构建尝试配置列表（按优先级排序）
+    var configs = [];
+    var delegates = ['GPU', 'CPU'];
+    for (var d = 0; d < delegates.length; d++) {
+      for (var w = 0; w < wasmSources.length; w++) {
+        for (var m = 0; m < modelPaths.length; m++) {
+          // 优化：本地WASM时只用本地模型（同源，要么都成功要么都失败）
+          if (w === 0 && m > 0) continue;
+          // 优化：非国内CDN不尝试CDN模型（减少无效尝试）
+          if (w !== 1 && m > 0) continue;
+          configs.push({
+            delegate: delegates[d],
+            wasmUrl: wasmSources[w].url,
+            modelUrl: modelPaths[m].url,
+            label: wasmSources[w].label + '/' + delegates[d] + (m > 0 ? '/CDN模型' : '')
+          });
         }
-        var wasmBase = wasmSources[srcIdx];
-        var srcLabel = srcIdx === 0 ? '本地' : 'CDN';
-        self._gestureLabel.textContent = '加载WASM(' + srcLabel + ')... ' + delegate;
-        return vision.FilesetResolver.forVisionTasks(wasmBase).then(function(resolver) {
+      }
+    }
+
+    function tryConfig(idx) {
+      if (idx >= configs.length) {
+        // 所有配置都失败了，显示真实错误信息
+        var detail = allErrors.slice(0, 4).join(' | ');
+        throw new Error('WASM:AI引擎初始化失败。' + detail);
+      }
+      var c = configs[idx];
+      self._gestureLabel.textContent = '加载AI(' + c.label + ')...';
+
+      return withTimeout(
+        vision.FilesetResolver.forVisionTasks(c.wasmUrl).then(function(resolver) {
           return vision.HandLandmarker.createFromOptions(resolver, {
-            baseOptions: { modelAssetPath: modelPath, delegate: delegate },
+            baseOptions: { modelAssetPath: c.modelUrl, delegate: c.delegate },
             numHands: 1,
             minHandDetectionConfidence: 0.5,
             minHandPresenceConfidence: 0.5,
             minTrackingConfidence: 0.5,
             runningMode: 'VIDEO'
           });
-        }).then(function(hl) {
-          self._handLandmarker = hl;
-          self._gestureLabel.textContent = 'AI引擎就绪';
-        }).catch(function(err) {
-          console.warn('[StardustGesture] WASM加载失败(' + srcLabel + '/' + delegate + '):', err.message);
-          // 当前源失败，尝试下一个源
-          return tryWasmSource(srcIdx + 1);
-        });
-      }
-
-      return tryWasmSource(0);
+        }), PER_SOURCE_TIMEOUT
+      ).then(function(hl) {
+        self._handLandmarker = hl;
+        self._gestureLabel.textContent = 'AI引擎就绪';
+      }).catch(function(err) {
+        var msg = c.label + ': ' + (err.message || '未知错误');
+        allErrors.push(msg);
+        console.warn('[StardustGesture] 失败(' + msg + ')');
+        return tryConfig(idx + 1);
+      });
     }
 
-    return tryDelegate(0);
+    return tryConfig(0);
   };
 
   /* ================================================================
@@ -948,16 +993,26 @@
    * ================================================================ */
   if (typeof window !== 'undefined' && window.location && window.location.protocol !== 'file:') {
     setTimeout(function() {
-      try {
-        import(absUrl('vision_bundle.mjs')).then(function(vision) {
+      function preloadFromSource(path, label) {
+        return import(path).then(function(vision) {
           if (!vision) return;
           var v = vision.FilesetResolver ? vision : (vision.default && vision.default.FilesetResolver ? vision.default : null);
           if (v && !window.__sgVision) {
             window.__sgVision = v;
-            console.log('[StardustGesture] AI引擎预加载完成（用户点击时直接使用缓存）');
+            console.log('[StardustGesture] AI引擎预加载完成(' + label + ')');
           }
-        }).catch(function() { /* 预加载失败静默处理，正式加载时会重试 */ });
-      } catch(e) { /* 预加载失败静默处理 */ }
+        });
+      }
+      // 本地优先，失败则尝试CDN
+      preloadFromSource(absUrl('vision_bundle.mjs'), '本地').catch(function() {
+        // 本地失败，依次尝试CDN
+        var chain = Promise.reject();
+        CDN_SOURCES.forEach(function(cdn, i) {
+          var label = i === 0 ? '国内CDN' : i === 1 ? 'jsdelivr' : 'unpkg';
+          chain = chain.catch(function() { return preloadFromSource(cdn + '/vision_bundle.mjs', label); });
+        });
+        chain.catch(function() { /* 预加载失败静默处理，正式加载时会重试 */ });
+      });
     }, 2000); // 页面加载2秒后开始预取，避免与Three.js初始化争抢带宽
   }
 

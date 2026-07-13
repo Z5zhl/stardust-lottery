@@ -131,6 +131,30 @@ html,body{width:100%;height:100%;overflow:hidden;background:#020510;font-family:
 #keys-hint.show{opacity:1}
 #keys-hint .k{display:inline-block;padding:1px 6px;border-radius:3px;background:rgba(0,140,220,0.1);border:1px solid rgba(0,140,220,0.2);font-family:monospace;font-size:10px;margin:0 2px;color:rgba(80,160,220,0.5);}
 
+/* 奖品池预览面板 */
+#prize-pool-overlay{position:fixed;inset:0;z-index:450;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s;}
+#prize-pool-overlay.active{opacity:1;pointer-events:all;}
+#prize-pool-bg{position:absolute;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+#prize-pool-content{position:relative;z-index:1;max-width:720px;max-height:80vh;overflow-y:auto;background:rgba(4,12,28,0.95);border:1px solid rgba(0,200,255,0.3);border-radius:16px;padding:32px 40px;box-shadow:0 0 60px rgba(0,180,255,0.15);}
+#prize-pool-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(10,20,40,0.6);border:1px solid rgba(80,160,240,0.3);color:rgba(130,200,255,0.7);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;}
+#prize-pool-close:hover{background:rgba(20,40,60,0.7);color:#80d8ff;transform:rotate(90deg);}
+#prize-pool-title{font-size:24px;color:rgba(0,220,255,0.8);text-align:center;margin-bottom:8px;letter-spacing:0.1em;font-weight:700;}
+#prize-pool-stats{text-align:center;font-size:13px;color:rgba(100,180,240,0.5);margin-bottom:20px;letter-spacing:0.08em;}
+#prize-pool-list{display:flex;flex-direction:column;gap:16px;}
+.prize-pool-group{display:flex;flex-direction:column;gap:8px;}
+.prize-pool-group-title{font-size:14px;letter-spacing:0.15em;font-weight:600;padding:4px 12px;border-radius:6px;display:inline-block;width:fit-content;}
+.prize-pool-group.legendary .prize-pool-group-title{color:#ffd740;background:rgba(255,215,64,0.08);border:1px solid rgba(255,215,64,0.2);}
+.prize-pool-group.rare .prize-pool-group-title{color:#80d8ff;background:rgba(128,216,255,0.08);border:1px solid rgba(128,216,255,0.2);}
+.prize-pool-group.common .prize-pool-group-title{color:#b0bec5;background:rgba(176,190,197,0.08);border:1px solid rgba(176,190,197,0.15);}
+.prize-pool-items{display:flex;flex-wrap:wrap;gap:10px;}
+.prize-pool-item{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;background:rgba(8,16,32,0.6);border:1px solid rgba(0,140,220,0.12);transition:all .3s;}
+.prize-pool-item:hover{border-color:rgba(0,200,255,0.3);background:rgba(12,24,48,0.7);transform:translateY(-2px);}
+.prize-pool-item img{width:40px;height:40px;border-radius:6px;object-fit:cover;}
+.prize-pool-item-name{font-size:14px;color:rgba(200,225,245,0.85);letter-spacing:0.05em;}
+.prize-pool-item-limit{font-size:10px;color:rgba(255,171,0,0.6);margin-left:4px;}
+.prize-pool-item.sold-out{opacity:0.35;}
+.prize-pool-item.sold-out .prize-pool-item-name{text-decoration:line-through;}
+
 /* 手势 */
 #gesture-indicator{position:fixed;top:80px;right:24px;z-index:95;display:flex;flex-direction:column;gap:4px;opacity:0;transition:opacity .4s;pointer-events:none;}
 #gesture-indicator.show{opacity:1}
@@ -265,7 +289,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:#020510;font-family:
   </div>
   <button class="hud-btn" id="btn-reset">↺</button>
   <button class="hud-btn" id="btn-auto">⚡</button>
+  <button class="hud-btn" id="btn-prize-pool" title="奖品池">🎁</button>
   <button class="hud-btn" id="btn-gesture">✋</button>
+</div>
+
+<!-- 奖品池预览面板 -->
+<div id="prize-pool-overlay">
+  <div id="prize-pool-bg"></div>
+  <div id="prize-pool-content">
+    <button id="prize-pool-close">✕</button>
+    <h2 id="prize-pool-title">🎁 奖品池</h2>
+    <div id="prize-pool-stats"></div>
+    <div id="prize-pool-list"></div>
+  </div>
 </div>
 
 <div id="keys-hint">
@@ -455,7 +491,7 @@ const RARITY_CFG={
     auroraRings:5,              // 展示时的旋转光环层数（5层光冕）
     billboardGlowIntensity:120, // 文字板发光强度
     billboardGlowSize:0.7,     // 文字板光晕大小
-    showDuration:12,            // 展示时长（秒）
+    showDuration:20,            // 展示时长（秒）
     autoRotateSpeed:1.5,        // 展示时旋转速度
     iconType:'star8',iconGlow:50,cornerSize:48,cornerGlow:20,
     showSparkles:true,bgGlowSize:0.8,bgGlowAlpha:'80',
@@ -489,7 +525,7 @@ const RARITY_CFG={
     vortexCountMultiplier:1.8,lightPillars:6,pillarHeight:12,
     goldenSparkle:false,sparkleColor:'#80d8ff',
     auroraRings:2,billboardGlowIntensity:60,billboardGlowSize:0.4,
-    showDuration:8,autoRotateSpeed:1.0,
+    showDuration:14,autoRotateSpeed:1.0,
     iconType:'hex6',iconGlow:35,cornerSize:34,cornerGlow:14,
     showSparkles:true,bgGlowSize:0.55,bgGlowAlpha:'50',
     secondaryExplosion:false,fountainHeight:10,fountainParticles:500,
@@ -510,7 +546,7 @@ const RARITY_CFG={
     vortexCountMultiplier:1.0,lightPillars:0,pillarHeight:0,
     goldenSparkle:false,sparkleColor:'#b0bec5',
     auroraRings:0,billboardGlowIntensity:30,billboardGlowSize:0.2,
-    showDuration:6,autoRotateSpeed:0.6,
+    showDuration:10,autoRotateSpeed:0.6,
     iconType:'diamond4',iconGlow:18,cornerSize:20,cornerGlow:6,
     showSparkles:false,bgGlowSize:0.4,bgGlowAlpha:'25',
     secondaryExplosion:false,fountainHeight:6,fountainParticles:200,
@@ -2684,6 +2720,47 @@ function showPrizeOverlay(prize){
   el('hud-chrg').textContent=prize.rarity==='legendary'?'100%':'098%';
 }
 function hidePrizeOverlay(){prizeOverlay.classList.remove('active');prizeCardImage.style.display='none';if(prizeBillboard){prizeBillboard.visible=false;prizeBillboard.material.opacity=0;}}
+
+// ==================== 奖品池预览 ====================
+function showPrizePool(){
+  var poolOverlay=el('prize-pool-overlay');
+  var poolList=el('prize-pool-list');
+  var poolStats=el('prize-pool-stats');
+  // 按稀有度分组
+  var groups={legendary:[],rare:[],common:[]};
+  PRIZES.forEach(function(p){
+    var r=p.rarity||'common';
+    if(!groups[r])groups[r]=[];
+    groups[r].push(p);
+  });
+  // 统计
+  var total=PRIZES.length;
+  var drawn=drawHistory?drawHistory.length:0;
+  poolStats.textContent='共 '+total+' 个奖品 · 已抽 '+drawn+' 次';
+  // 渲染
+  var html='';
+  var labels={legendary:'★ 传说',rare:'★★ 稀有',common:'普通'};
+  var order=['legendary','rare','common'];
+  order.forEach(function(r){
+    if(!groups[r]||groups[r].length===0)return;
+    html+='<div class="prize-pool-group '+r+'">';
+    html+='<div class="prize-pool-group-title">'+labels[r]+' ('+groups[r].length+')</div>';
+    html+='<div class="prize-pool-items">';
+    groups[r].forEach(function(p){
+      var soldOut=p.maxDraws&&p.drawCount>=p.maxDraws;
+      var limitTag=p.maxDraws?'<span class="prize-pool-item-limit">限'+p.maxDraws+'次</span>':'';
+      var imgTag=p.image?'<img src="'+p.image+'" onerror="this.style.display=\'none\'">':'';
+      html+='<div class="prize-pool-item'+(soldOut?' sold-out':'')+'">'+imgTag+'<span class="prize-pool-item-name">'+p.name+'</span>'+limitTag+'</div>';
+    });
+    html+='</div></div>';
+  });
+  poolList.innerHTML=html;
+  poolOverlay.classList.add('active');
+}
+function hidePrizePool(){el('prize-pool-overlay').classList.remove('active');}
+el('btn-prize-pool').addEventListener('click',showPrizePool);
+el('prize-pool-close').addEventListener('click',hidePrizePool);
+el('prize-pool-bg').addEventListener('click',hidePrizePool);
 function updateProgressRing(progress){
   if(progress>0&&progress<1){progressRing.classList.add('active');progressCircle.style.strokeDashoffset=257.6*(1-progress);}
   else progressRing.classList.remove('active');
@@ -2711,7 +2788,7 @@ document.addEventListener('keydown',e=>{
   else if(e.key===' '||e.key==='Spacebar'){e.preventDefault();startDraw();}
   else if(e.key==='r'||e.key==='R'){resetAll();}
   else if(e.key==='a'||e.key==='A'){toggleAuto();}
-  else if(e.key==='Escape'){hidePrizeOverlay();resetAll();}
+  else if(e.key==='Escape'){hidePrizeOverlay();hidePrizePool();resetAll();}
   else if(e.key==='h'||e.key==='H'){keysHint.classList.toggle('show');}
   else if(e.key==='g'||e.key==='G'){toggleGesture();}
 });
